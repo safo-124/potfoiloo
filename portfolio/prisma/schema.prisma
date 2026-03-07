@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Portfolio Content Models ─────────────────────────────────
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  longDescription String? @db.Text
+  imageUrl    String?
+  demoUrl     String?
+  githubUrl   String?
+  tags        String[] // e.g. ["ML", "DSP", "Python"]
+  category    String   // ML, DSP, Computer Vision, etc.
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Experience {
+  id          String   @id @default(cuid())
+  title       String   // e.g. "Masters in Signal Processing"
+  company     String   // e.g. "University Name"
+  location    String?
+  description String   @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean  @default(false)
+  type        String   // "education" | "work" | "research"
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Skill {
+  id       String @id @default(cuid())
+  name     String
+  category String // "Languages", "Frameworks", "Tools", "Domains"
+  level    Int    @default(80) // 0-100
+  icon     String? // icon name
+  order    Int    @default(0)
+}
+
+model Publication {
+  id        String   @id @default(cuid())
+  title     String
+  authors   String
+  venue     String   // Journal/Conference name
+  year      Int
+  abstract  String?  @db.Text
+  doi       String?
+  pdfUrl    String?
+  type      String   // "journal" | "conference" | "thesis"
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String   @db.Text
+  coverImage  String?
+  tags        String[]
+  published   Boolean  @default(false)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id          String  @id @default("main")
+  name        String  @default("Emmanuel Safo Acheampong")
+  title       String  @default("Signal Processing & ML Engineer")
+  tagline     String  @default("Bridging the gap between signal theory and intelligent systems")
+  about       String? @db.Text
+  avatarUrl   String?
+  resumeUrl   String?
+  email       String?
+  github      String?
+  linkedin    String?
+  scholar     String?
+  twitter     String?
+}
