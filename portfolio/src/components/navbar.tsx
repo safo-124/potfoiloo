@@ -54,11 +54,11 @@ const navLinks = [
 const overlayVariants = {
   closed: {
     opacity: 0,
-    transition: { duration: 0.3, ease: "easeInOut", when: "afterChildren" },
+    transition: { duration: 0.3, ease: "easeInOut" as const, when: "afterChildren" as const },
   },
   open: {
     opacity: 1,
-    transition: { duration: 0.3, ease: "easeInOut", when: "beforeChildren" },
+    transition: { duration: 0.3, ease: "easeInOut" as const, when: "beforeChildren" as const },
   },
 };
 
@@ -73,7 +73,7 @@ const menuItemVariants = {
     opacity: 1,
     x: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.35, ease: [0.25, 0.4, 0.25, 1] },
+    transition: { duration: 0.35, ease: [0.25, 0.4, 0.25, 1] as const },
   },
 };
 
@@ -189,7 +189,7 @@ export function Navbar() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative z-[60]"
+                className="relative z-60"
               >
                 <AnimatePresence mode="wait">
                   {isOpen ? (
@@ -228,7 +228,7 @@ export function Navbar() {
             initial="closed"
             animate="open"
             exit="closed"
-            className="fixed inset-0 z-[55] md:hidden"
+            className="fixed inset-0 z-55 md:hidden"
           >
             {/* Backdrop */}
             <div className="absolute inset-0 bg-background/98 backdrop-blur-xl" />
@@ -237,8 +237,8 @@ export function Navbar() {
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-emerald-500/10 blur-3xl" />
               <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-emerald-500/5 blur-3xl" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border border-emerald-500/5" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full border border-emerald-500/5" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 rounded-full border border-emerald-500/5" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-75 h-75 rounded-full border border-emerald-500/5" />
             </div>
 
             {/* Menu Content */}
