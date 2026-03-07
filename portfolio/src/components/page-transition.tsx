@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { type Variants, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
-const variants = {
+const variants: Variants = {
   hidden: {
     opacity: 0,
     y: 20,
@@ -15,7 +15,7 @@ const variants = {
     filter: "blur(0px)",
     transition: {
       duration: 0.4,
-      ease: [0.25, 0.4, 0.25, 1],
+      ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number],
     },
   },
   exit: {
@@ -24,7 +24,7 @@ const variants = {
     filter: "blur(4px)",
     transition: {
       duration: 0.2,
-      ease: [0.25, 0.4, 0.25, 1],
+      ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number],
     },
   },
 };
