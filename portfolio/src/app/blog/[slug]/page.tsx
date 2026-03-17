@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
 export default async function BlogPostPage({

@@ -1,5 +1,5 @@
 import { AboutSection, ExperienceSection, SkillsSection } from "@/components/sections";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export const metadata = {
   title: "About | Emmanuel Safo Acheampong",

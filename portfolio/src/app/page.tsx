@@ -1,6 +1,6 @@
 import { HeroSection } from "@/components/sections";
 import { HomePreview } from "@/components/home-preview";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export default async function Home() {
   let featuredProjects, projectCount, pubCount;
