@@ -96,8 +96,8 @@ const projects = [
 
 interface ProjectData {
   title: string; slug: string; description: string; tags: string[];
-  category: string; featured: boolean; imageUrl?: string;
-  demoUrl?: string; githubUrl?: string;
+  category: string; featured: boolean; imageUrl?: string | null;
+  demoUrl?: string | null; githubUrl?: string | null;
 }
 
 export function ProjectsSection({ data }: { data?: ProjectData[] }) {

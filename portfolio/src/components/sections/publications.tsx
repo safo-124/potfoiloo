@@ -58,7 +58,7 @@ const typeStyles = {
 
 interface PublicationData {
   title: string; authors: string; venue: string; year: number;
-  type: string; abstract?: string; doi?: string; pdfUrl?: string;
+  type: string; abstract?: string | null; doi?: string | null; pdfUrl?: string | null;
 }
 
 export function PublicationsSection({ data }: { data?: PublicationData[] }) {

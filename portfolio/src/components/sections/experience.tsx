@@ -83,8 +83,8 @@ const typeColors = {
 };
 
 interface ExperienceData {
-  type: string; title: string; company: string; location?: string;
-  startDate: string; endDate?: string; current: boolean;
+  type: string; title: string; company: string; location?: string | null;
+  startDate: string; endDate?: string | null; current: boolean;
   description: string; highlights?: string[];
 }
 
@@ -178,7 +178,7 @@ export function ExperienceSection({ data }: { data?: ExperienceData[] }) {
                         index % 2 !== 0 ? "md:text-right" : ""
                       }`}
                     >
-                      {exp.highlights.map((h, i) => (
+                      {exp.highlights?.map((h, i) => (
                         <li key={i} className="flex items-start gap-2">
                           <span className="text-primary mt-1">▸</span>
                           <span>{h}</span>
