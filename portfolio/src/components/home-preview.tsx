@@ -55,7 +55,13 @@ const highlights = [
   { icon: Database, title: "Data Analysis", color: "text-emerald-500" },
 ];
 
-export function HomePreview() {
+interface HomePreviewProps {
+  featuredProjectsData?: { title: string; description: string; tags: string[]; category: string }[];
+  stats?: { projects: string; publications: string; yearsStudy: string; languages: string };
+}
+
+export function HomePreview({ featuredProjectsData, stats: statsData }: HomePreviewProps) {
+  const displayProjects = featuredProjectsData && featuredProjectsData.length > 0 ? featuredProjectsData : featuredProjects;
   return (
     <>
       {/* About Preview */}
@@ -137,7 +143,7 @@ export function HomePreview() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredProjects.map((project, index) => (
+            {displayProjects.map((project, index) => (
               <motion.div
                 key={project.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -186,10 +192,10 @@ export function HomePreview() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
             {[
-              { icon: Briefcase, label: "Projects", value: "6+" },
-              { icon: BookOpen, label: "Publications", value: "3" },
-              { icon: GraduationCap, label: "Years Study", value: "6+" },
-              { icon: Code2, label: "Languages", value: "8+" },
+              { icon: Briefcase, label: "Projects", value: statsData?.projects || "6+" },
+              { icon: BookOpen, label: "Publications", value: statsData?.publications || "3" },
+              { icon: GraduationCap, label: "Years Study", value: statsData?.yearsStudy || "6+" },
+              { icon: Code2, label: "Languages", value: statsData?.languages || "8+" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}

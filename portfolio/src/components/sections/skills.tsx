@@ -90,7 +90,29 @@ function SkillBar({ name, level, delay }: { name: string; level: number; delay: 
   );
 }
 
-export function SkillsSection() {
+interface SkillData {
+  name: string; category: string; level: number;
+}
+interface SkillCategory {
+  id: string; label: string; skills: { name: string; level: number }[];
+}
+
+function groupSkillsIntoCategories(skills: SkillData[]): SkillCategory[] {
+  const catMap: Record<string, { name: string; level: number }[]> = {};
+  for (const s of skills) {
+    const key = s.category;
+    if (!catMap[key]) catMap[key] = [];
+    catMap[key].push({ name: s.name, level: s.level });
+  }
+  return Object.entries(catMap).map(([label, skills]) => ({
+    id: label.toLowerCase().replace(/[^a-z]/g, ""),
+    label,
+    skills,
+  }));
+}
+
+export function SkillsSection({ data }: { data?: SkillData[] }) {
+  const categories = data && data.length > 0 ? groupSkillsIntoCategories(data) : skillCategories;
   return (
     <section id="skills" className="py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -119,14 +141,14 @@ export function SkillsSection() {
         >
           <Tabs defaultValue="languages" className="w-full">
             <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-8">
-              {skillCategories.map((cat) => (
+              {categories.map((cat) => (
                 <TabsTrigger key={cat.id} value={cat.id}>
                   {cat.label}
                 </TabsTrigger>
               ))}
             </TabsList>
 
-            {skillCategories.map((cat) => (
+            {categories.map((cat) => (
               <TabsContent key={cat.id} value={cat.id}>
                 <div className="p-6 rounded-lg border border-border bg-card">
                   <div className="space-y-5">

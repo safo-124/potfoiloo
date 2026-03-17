@@ -56,7 +56,13 @@ const typeStyles = {
   thesis: "bg-purple-500/10 text-purple-500",
 };
 
-export function PublicationsSection() {
+interface PublicationData {
+  title: string; authors: string; venue: string; year: number;
+  type: string; abstract?: string; doi?: string; pdfUrl?: string;
+}
+
+export function PublicationsSection({ data }: { data?: PublicationData[] }) {
+  const allPublications = data && data.length > 0 ? data : publications;
   return (
     <section id="publications" className="py-24 bg-card/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,7 +83,7 @@ export function PublicationsSection() {
         </motion.div>
 
         <div className="max-w-4xl mx-auto space-y-6">
-          {publications.map((pub, index) => (
+          {allPublications.map((pub, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}

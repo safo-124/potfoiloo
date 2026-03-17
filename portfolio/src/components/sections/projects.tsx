@@ -94,13 +94,20 @@ const projects = [
   },
 ];
 
-export function ProjectsSection() {
+interface ProjectData {
+  title: string; slug: string; description: string; tags: string[];
+  category: string; featured: boolean; imageUrl?: string;
+  demoUrl?: string; githubUrl?: string;
+}
+
+export function ProjectsSection({ data }: { data?: ProjectData[] }) {
   const [filter, setFilter] = useState("All");
+  const allProjects = data && data.length > 0 ? data : projects;
 
   const filteredProjects =
     filter === "All"
-      ? projects
-      : projects.filter((p) => p.category === filter);
+      ? allProjects
+      : allProjects.filter((p) => p.category === filter);
 
   return (
     <section id="projects" className="py-24 bg-card/50">

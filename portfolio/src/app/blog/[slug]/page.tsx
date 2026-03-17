@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import prisma from "@/lib/prisma";
+import { notFound } from "next/navigation";
 
 export default async function BlogPostPage({
   params,
@@ -9,8 +11,21 @@ export default async function BlogPostPage({
 }) {
   const { slug } = await params;
 
-  // Placeholder — later this will fetch from Prisma
-  const post = {
+  let dbPost;
+  try {
+    dbPost = await prisma.blogPost.findUnique({ where: { slug } });
+    if (dbPost) {
+      await prisma.blogPost.update({ where: { slug }, data: { views: { increment: 1 } } });
+    }
+  } catch { dbPost = null; }
+
+  const post = dbPost ? {
+    title: dbPost.title,
+    date: dbPost.createdAt.toISOString().split("T")[0],
+    readTime: `${Math.max(1, Math.round(dbPost.content.length / 1000))} min`,
+    tags: dbPost.tags,
+    content: dbPost.content,
+  } : {
     title: slug
       .split("-")
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -18,43 +33,7 @@ export default async function BlogPostPage({
     date: "2025-12-15",
     readTime: "8 min",
     tags: ["DSP", "Python", "Tutorial"],
-    content: `
-## Introduction
-
-This is a placeholder blog post for **"${slug}"**. When the database is connected, this content will be fetched dynamically from Prisma.
-
-## What You'll Learn
-
-- Foundational concepts and mathematical background
-- Practical implementation in Python
-- Real-world applications and use cases
-- Tips for optimization and best practices
-
-## Code Example
-
-\`\`\`python
-import numpy as np
-
-# Example DSP code
-def compute_fft(signal, sample_rate):
-    """Compute the FFT of a signal."""
-    N = len(signal)
-    fft_result = np.fft.fft(signal)
-    frequencies = np.fft.fftfreq(N, 1/sample_rate)
-    magnitude = np.abs(fft_result) / N
-    return frequencies[:N//2], magnitude[:N//2]
-
-# Generate a test signal
-t = np.linspace(0, 1, 1000)
-signal = np.sin(2 * np.pi * 50 * t) + 0.5 * np.sin(2 * np.pi * 120 * t)
-
-freqs, mags = compute_fft(signal, 1000)
-\`\`\`
-
-## Conclusion
-
-Stay tuned for the full article! Connect your PostgreSQL database and use the admin panel to write and publish blog posts.
-    `,
+    content: `## Introduction\n\nThis is a placeholder blog post for **"${slug}"**. When the database is connected, this content will be fetched dynamically from Prisma.\n\n## What You'll Learn\n\n- Foundational concepts and mathematical background\n- Practical implementation in Python\n- Real-world applications and use cases\n\n## Conclusion\n\nConnect your PostgreSQL database and use the admin panel to write and publish blog posts.`,
   };
 
   return (

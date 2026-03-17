@@ -42,7 +42,18 @@ const blogPosts = [
   },
 ];
 
-export function BlogSection() {
+interface BlogPostData {
+  title: string; slug: string; excerpt: string;
+  tags: string[]; date?: string; readTime?: string;
+  createdAt?: string;
+}
+
+export function BlogSection({ data }: { data?: BlogPostData[] }) {
+  const allPosts = data && data.length > 0 ? data.map(p => ({
+    ...p,
+    date: p.date || p.createdAt || new Date().toISOString(),
+    readTime: p.readTime || "5 min",
+  })) : blogPosts;
   return (
     <section id="blog" className="py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,7 +74,7 @@ export function BlogSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {blogPosts.map((post, index) => (
+          {allPosts.map((post, index) => (
             <motion.div
               key={post.slug}
               initial={{ opacity: 0, y: 20 }}

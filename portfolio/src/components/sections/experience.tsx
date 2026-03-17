@@ -82,7 +82,14 @@ const typeColors = {
   research: "bg-purple-500/10 text-purple-500 border-purple-500/30",
 };
 
-export function ExperienceSection() {
+interface ExperienceData {
+  type: string; title: string; company: string; location?: string;
+  startDate: string; endDate?: string; current: boolean;
+  description: string; highlights?: string[];
+}
+
+export function ExperienceSection({ data }: { data?: ExperienceData[] }) {
+  const allExperiences = data && data.length > 0 ? data : experiences;
   return (
     <section id="experience" className="py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -107,7 +114,7 @@ export function ExperienceSection() {
           {/* Timeline line */}
           <div className="absolute left-6 md:left-1/2 md:-translate-x-px top-0 bottom-0 w-0.5 bg-border" />
 
-          {experiences.map((exp, index) => {
+          {allExperiences.map((exp, index) => {
             const Icon =
               typeIcons[exp.type as keyof typeof typeIcons] || Briefcase;
             const colorClass =

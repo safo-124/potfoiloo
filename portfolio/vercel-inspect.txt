@@ -1,0 +1,25 @@
+Fetching deployment "potfoiloo-46syqkj9d-safo124s-projects.vercel.app" in safo124s-projects
+> Fetched deployment "potfoiloo-46syqkj9d-safo124s-projects.vercel.app" in safo124s-projects [421ms]
+System.Management.Automation.RemoteException
+  General
+System.Management.Automation.RemoteException
+    id		dpl_D1Tp7c3Db5b8P98LJqXEJdJ4B19z
+    name	potfoiloo
+    target	production
+    status	GùÅ Ready
+    url		https://potfoiloo-46syqkj9d-safo124s-projects.vercel.app
+    created	Sat Mar 07 2026 21:15:03 GMT+0200 (Eastern European Standard Time) [9m ago]
+System.Management.Automation.RemoteException
+System.Management.Automation.RemoteException
+  Aliases
+System.Management.Automation.RemoteException
+    Gò¦ https://potfoiloo.vercel.app
+    Gò¦ https://potfoiloo-safo124s-projects.vercel.app
+    Gò¦ https://potfoiloo-safo-124-safo124s-projects.vercel.app
+    
+System.Management.Automation.RemoteException
+  Builds
+System.Management.Automation.RemoteException
+    Gò¦ .        [0ms]
+    
+System.Management.Automation.RemoteException

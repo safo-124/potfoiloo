@@ -1,9 +1,27 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import prisma from "@/lib/prisma";
 
-export default function BlogPage() {
-  // Placeholder blog posts — later these will come from Prisma
-  const posts = [
+export default async function BlogPage() {
+  let dbPosts;
+  try {
+    dbPosts = await prisma.blogPost.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch { dbPosts = []; }
+
+  // Fallback to placeholder posts if DB is empty
+  const posts = dbPosts.length > 0
+    ? dbPosts.map(p => ({
+        title: p.title,
+        slug: p.slug,
+        excerpt: p.excerpt,
+        tags: p.tags,
+        date: p.createdAt.toISOString().split("T")[0],
+        readTime: `${Math.max(1, Math.round(p.content.length / 1000))} min`,
+      }))
+    : [
     {
       title: "Understanding Fourier Transforms: From Theory to Python Implementation",
       slug: "understanding-fourier-transforms",
