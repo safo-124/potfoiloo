@@ -7,10 +7,10 @@ export const metadata = {
 };
 
 export default async function ProjectsPage() {
-  let projects;
+  let projects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
   try {
     projects = await prisma.project.findMany({ orderBy: { order: "asc" } });
-  } catch { projects = []; }
+  } catch { /* empty */ }
 
   return (
     <div className="pt-16">

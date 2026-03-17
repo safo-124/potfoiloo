@@ -7,10 +7,10 @@ export const metadata = {
 };
 
 export default async function PublicationsPage() {
-  let publications;
+  let publications: Awaited<ReturnType<typeof prisma.publication.findMany>> = [];
   try {
     publications = await prisma.publication.findMany({ orderBy: { order: "asc" } });
-  } catch { publications = []; }
+  } catch { /* empty */ }
 
   return (
     <div className="pt-16">

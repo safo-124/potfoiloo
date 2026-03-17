@@ -7,13 +7,14 @@ export const metadata = {
 };
 
 export default async function AboutPage() {
-  let experiences, skills;
+  let experiences: Awaited<ReturnType<typeof prisma.experience.findMany>> = [];
+  let skills: Awaited<ReturnType<typeof prisma.skill.findMany>> = [];
   try {
     experiences = await prisma.experience.findMany({ orderBy: { order: "asc" } });
-  } catch { experiences = []; }
+  } catch { /* empty */ }
   try {
     skills = await prisma.skill.findMany({ orderBy: { order: "asc" } });
-  } catch { skills = []; }
+  } catch { /* empty */ }
 
   const experienceData = experiences.map(e => ({
     ...e,

@@ -3,13 +3,13 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export default async function BlogPage() {
-  let dbPosts;
+  let dbPosts: Awaited<ReturnType<typeof prisma.blogPost.findMany>> = [];
   try {
     dbPosts = await prisma.blogPost.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
     });
-  } catch { dbPosts = []; }
+  } catch { /* empty */ }
 
   // Fallback to placeholder posts if DB is empty
   const posts = dbPosts.length > 0
