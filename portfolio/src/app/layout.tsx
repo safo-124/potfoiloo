@@ -5,6 +5,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { PageTransition } from "@/components/page-transition";
 import { RouteProgress } from "@/components/route-progress";
+import { WhatsAppWidget } from "@/components/whatsapp-widget";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -73,6 +74,7 @@ export default function RootLayout({
             <PageTransition>{children}</PageTransition>
           </main>
           <Footer />
+          <WhatsAppWidget />
         </ThemeProvider>
       </body>
     </html>
