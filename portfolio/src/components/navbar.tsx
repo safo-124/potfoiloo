@@ -54,11 +54,19 @@ const navLinks = [
 const overlayVariants = {
   closed: {
     opacity: 0,
-    transition: { duration: 0.3, ease: "easeInOut" as const, when: "afterChildren" as const },
+    transition: {
+      duration: 0.3,
+      ease: "easeInOut" as const,
+      when: "afterChildren" as const,
+    },
   },
   open: {
     opacity: 1,
-    transition: { duration: 0.3, ease: "easeInOut" as const, when: "beforeChildren" as const },
+    transition: {
+      duration: 0.3,
+      ease: "easeInOut" as const,
+      when: "beforeChildren" as const,
+    },
   },
 };
 
@@ -87,7 +95,7 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -103,16 +111,19 @@ export function Navbar() {
     };
   }, [isOpen]);
 
+  const mainLinks = navLinks.filter((l) => l.href !== "/contact");
+  const contactLink = navLinks.find((l) => l.href === "/contact")!;
+
   return (
     <>
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
           scrolled
-            ? "bg-background/80 backdrop-blur-lg border-b border-border shadow-sm"
+            ? "bg-background/70 backdrop-blur-2xl border-b border-border/50 shadow-[0_1px_30px_-12px] shadow-primary/10"
             : "bg-transparent"
         )}
       >
@@ -121,75 +132,126 @@ export function Navbar() {
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-2 text-primary font-bold text-xl"
+              className="group flex items-center gap-2.5 text-primary font-bold text-xl"
             >
-              <Terminal className="h-6 w-6" />
-              <span className="font-mono">ESA</span>
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors duration-300">
+                <Terminal className="h-4.5 w-4.5" />
+              </div>
+              <div className="flex items-baseline gap-px font-mono">
+                <span className="text-foreground font-bold tracking-tight">
+                  ESA
+                </span>
+                <span className="text-primary animate-pulse">_</span>
+              </div>
             </Link>
 
-            {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => (
+            {/* Desktop Nav — centered pill */}
+            <div className="hidden md:flex items-center">
+              <div
+                className={cn(
+                  "flex items-center gap-0.5 rounded-full px-1.5 py-1 transition-all duration-500",
+                  scrolled
+                    ? "bg-muted/50 border border-border/50"
+                    : "bg-muted/30"
+                )}
+              >
+                {mainLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={cn(
+                        "relative px-3.5 py-1.5 text-sm font-medium transition-all duration-200 rounded-full",
+                        isActive
+                          ? "text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="navbar-pill"
+                          className="absolute inset-0 bg-primary rounded-full shadow-md shadow-primary/25"
+                          transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 30,
+                          }}
+                        />
+                      )}
+                      <span className="relative z-10">{link.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Contact CTA + theme toggle */}
+              <div className="flex items-center gap-2 ml-3">
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  href={contactLink.href}
                   className={cn(
-                    "relative px-3 py-2 text-sm font-medium transition-colors rounded-md hover:bg-accent",
-                    pathname === link.href
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-primary"
+                    "relative px-4 py-1.5 text-sm font-medium rounded-full border transition-all duration-200",
+                    pathname === contactLink.href
+                      ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/25"
+                      : "border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground hover:shadow-md hover:shadow-primary/25"
                   )}
                 >
-                  {link.label}
-                  {pathname === link.href && (
-                    <motion.div
-                      layoutId="navbar-active"
-                      className="absolute inset-0 bg-accent rounded-md -z-10"
-                      transition={{
-                        type: "spring",
-                        stiffness: 380,
-                        damping: 30,
-                      }}
-                    />
-                  )}
+                  {contactLink.label}
                 </Link>
-              ))}
-              {mounted && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="ml-2"
-                >
-                  {theme === "dark" ? (
-                    <Sun className="h-5 w-5" />
-                  ) : (
-                    <Moon className="h-5 w-5" />
-                  )}
-                </Button>
-              )}
+                {mounted && (
+                  <button
+                    onClick={() =>
+                      setTheme(theme === "dark" ? "light" : "dark")
+                    }
+                    className="flex items-center justify-center w-8 h-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                  >
+                    <AnimatePresence mode="wait">
+                      {theme === "dark" ? (
+                        <motion.div
+                          key="sun"
+                          initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                          exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Sun className="h-4 w-4" />
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="moon"
+                          initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                          exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Moon className="h-4 w-4" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Mobile Menu Toggle */}
-            <div className="md:hidden flex items-center gap-2">
+            {/* Mobile: theme + hamburger */}
+            <div className="md:hidden flex items-center gap-1">
               {mounted && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                <button
+                  onClick={() =>
+                    setTheme(theme === "dark" ? "light" : "dark")
+                  }
+                  className="flex items-center justify-center w-9 h-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                 >
                   {theme === "dark" ? (
-                    <Sun className="h-5 w-5" />
+                    <Sun className="h-4.5 w-4.5" />
                   ) : (
-                    <Moon className="h-5 w-5" />
+                    <Moon className="h-4.5 w-4.5" />
                   )}
-                </Button>
+                </button>
               )}
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative z-60"
+                className="relative z-60 flex items-center justify-center w-9 h-9 rounded-full hover:bg-muted/50 transition-colors"
               >
                 <AnimatePresence mode="wait">
                   {isOpen ? (
@@ -214,7 +276,7 @@ export function Navbar() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </Button>
+              </button>
             </div>
           </div>
         </nav>
@@ -235,22 +297,20 @@ export function Navbar() {
 
             {/* Decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-emerald-500/10 blur-3xl" />
-              <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-emerald-500/5 blur-3xl" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 rounded-full border border-emerald-500/5" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-75 h-75 rounded-full border border-emerald-500/5" />
+              <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
+              <div className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
             </div>
 
             {/* Menu Content */}
-            <div className="relative h-full flex flex-col justify-center px-8">
-              {/* Top branding area */}
+            <div className="relative h-full flex flex-col justify-center px-6 sm:px-8">
+              {/* Navigation label */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.3 }}
-                className="absolute top-20 left-8"
+                className="absolute top-20 left-6 sm:left-8"
               >
-                <p className="text-xs font-mono tracking-widest text-muted-foreground uppercase">
+                <p className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">
                   Navigation
                 </p>
               </motion.div>
@@ -263,7 +323,7 @@ export function Navbar() {
                 exit="closed"
                 className="flex flex-col gap-1"
               >
-                {navLinks.map((link, i) => {
+                {navLinks.map((link) => {
                   const Icon = link.icon;
                   const isActive = pathname === link.href;
                   return (
@@ -272,19 +332,19 @@ export function Navbar() {
                         href={link.href}
                         onClick={() => setIsOpen(false)}
                         className={cn(
-                          "group flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-200",
+                          "group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200",
                           isActive
-                            ? "bg-emerald-500/10 border border-emerald-500/20"
+                            ? "bg-primary/10 border border-primary/20"
                             : "hover:bg-muted/50 border border-transparent"
                         )}
                       >
                         {/* Icon */}
                         <div
                           className={cn(
-                            "flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200",
+                            "flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-200",
                             isActive
-                              ? "bg-emerald-500/20 text-emerald-500 shadow-lg shadow-emerald-500/10"
-                              : "bg-muted/80 text-muted-foreground group-hover:bg-emerald-500/10 group-hover:text-emerald-500"
+                              ? "bg-primary/20 text-primary shadow-lg shadow-primary/10"
+                              : "bg-muted/80 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                           )}
                         >
                           <Icon className="h-5 w-5" />
@@ -297,8 +357,8 @@ export function Navbar() {
                               className={cn(
                                 "text-lg font-semibold transition-colors",
                                 isActive
-                                  ? "text-emerald-500"
-                                  : "text-foreground group-hover:text-emerald-500"
+                                  ? "text-primary"
+                                  : "text-foreground group-hover:text-primary"
                               )}
                             >
                               {link.label}
@@ -306,7 +366,7 @@ export function Navbar() {
                             {isActive && (
                               <motion.span
                                 layoutId="mobile-active-dot"
-                                className="w-1.5 h-1.5 rounded-full bg-emerald-500"
+                                className="w-1.5 h-1.5 rounded-full bg-primary"
                               />
                             )}
                           </div>
@@ -320,7 +380,7 @@ export function Navbar() {
                           className={cn(
                             "h-4 w-4 transition-all duration-200 -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
                             isActive
-                              ? "text-emerald-500 opacity-100 translate-x-0"
+                              ? "text-primary opacity-100 translate-x-0"
                               : "text-muted-foreground"
                           )}
                         />
@@ -335,7 +395,7 @@ export function Navbar() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6, duration: 0.4 }}
-                className="absolute bottom-12 left-8 right-8"
+                className="absolute bottom-10 left-6 right-6 sm:left-8 sm:right-8"
               >
                 <div className="flex items-center gap-3 px-4">
                   <div className="h-px flex-1 bg-border" />
