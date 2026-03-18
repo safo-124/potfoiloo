@@ -1,6 +1,8 @@
 import { PublicationsSection } from "@/components/sections";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Publications | Emmanuel Safo Acheampong",
   description: "Peer-reviewed publications and research contributions in signal processing and machine learning.",

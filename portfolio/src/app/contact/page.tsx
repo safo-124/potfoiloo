@@ -1,6 +1,8 @@
 import { ContactSection } from "@/components/sections";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Contact | Emmanuel Safo Acheampong",
   description: "Get in touch for research collaboration, engineering projects, or career opportunities.",

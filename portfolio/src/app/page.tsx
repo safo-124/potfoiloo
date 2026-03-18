@@ -2,6 +2,8 @@ import { HeroSection } from "@/components/sections";
 import { HomePreview } from "@/components/home-preview";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   let featuredProjects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
   let projectCount = 0;

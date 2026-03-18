@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 export default async function BlogPage() {
   let dbPosts: Awaited<ReturnType<typeof prisma.blogPost.findMany>> = [];
   try {
