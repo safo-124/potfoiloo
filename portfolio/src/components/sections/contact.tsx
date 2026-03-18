@@ -23,6 +23,7 @@ import {
   Sparkles,
   Zap,
   Heart,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +52,12 @@ const projectTypes = [
     label: "Research Collab",
     icon: BookOpen,
     description: "Joint research, paper co-authorship, academic work",
+  },
+  {
+    id: "data-analysis",
+    label: "Data Analysis",
+    icon: BarChart3,
+    description: "Data pipelines, visualization, statistical modeling",
   },
   {
     id: "consultation",
