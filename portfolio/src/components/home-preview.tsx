@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,35 @@ import {
   BookOpen,
   Mail,
 } from "lucide-react";
+
+/* ─── Animated Counter ─── */
+function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const [display, setDisplay] = useState("0");
+
+  useEffect(() => {
+    if (!inView) return;
+    const num = parseInt(value.replace(/[^0-9]/g, ""), 10);
+    if (isNaN(num) || num === 0) { setDisplay(value); return; }
+    const hasSuffix = value.includes("+");
+    const duration = 1500;
+    const steps = 40;
+    const stepTime = duration / steps;
+    let step = 0;
+    const iv = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      const current = Math.round(eased * num);
+      setDisplay(current + (hasSuffix ? "+" : ""));
+      if (step >= steps) { clearInterval(iv); setDisplay(value); }
+    }, stepTime);
+    return () => clearInterval(iv);
+  }, [inView, value]);
+
+  return <span ref={ref}>{display}{suffix}</span>;
+}
 
 
 const highlights = [
@@ -185,7 +215,9 @@ export function HomePreview({ featuredProjectsData, stats: statsData }: HomePrev
                 className="text-center p-6 rounded-lg border border-border bg-card"
               >
                 <stat.icon className="h-6 w-6 text-primary mx-auto mb-2" />
-                <p className="text-3xl font-bold text-primary">{stat.value}</p>
+                <p className="text-3xl font-bold text-primary">
+                  <AnimatedCounter value={stat.value} />
+                </p>
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
               </motion.div>
             ))}

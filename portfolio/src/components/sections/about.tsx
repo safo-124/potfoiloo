@@ -118,19 +118,34 @@ export function AboutSection({ settings, skills }: AboutProps) {
               )}
             </div>
 
-            {/* Tech Stack */}
+            {/* Tech Stack — Infinite Marquee */}
             {techStack.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            <div className="overflow-hidden">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
                 Tech Stack
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {techStack.map((tech) => (
-                  <Badge key={tech} variant="secondary">
-                    {tech}
-                  </Badge>
-                ))}
+              {/* Row 1 */}
+              <div className="relative mb-3 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+                <div className="marquee-track">
+                  {[...techStack, ...techStack].map((tech, i) => (
+                    <Badge key={`a-${i}`} variant="secondary" className="mx-1.5 whitespace-nowrap text-sm px-3 py-1">
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
               </div>
+              {/* Row 2 — reverse direction */}
+              {techStack.length > 6 && (
+              <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+                <div className="marquee-track-reverse">
+                  {[...techStack.slice().reverse(), ...techStack.slice().reverse()].map((tech, i) => (
+                    <Badge key={`b-${i}`} variant="outline" className="mx-1.5 whitespace-nowrap text-sm px-3 py-1">
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              )}
             </div>
             )}
           </motion.div>

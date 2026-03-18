@@ -143,6 +143,61 @@
   background: var(--primary);
 }
 
+/* ─── Animated gradient border for featured cards ─── */
+.gradient-border-wrap {
+  position: relative;
+  border-radius: var(--radius);
+}
+.gradient-border-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--radius) + 2px);
+  background: conic-gradient(
+    from var(--gradient-angle, 0deg),
+    oklch(0.596 0.17 155.2),
+    oklch(0.7 0.14 180),
+    oklch(0.596 0.17 155.2),
+    oklch(0.5 0.18 140),
+    oklch(0.596 0.17 155.2)
+  );
+  z-index: -1;
+  animation: gradient-rotate 3s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.gradient-border-wrap:hover::before {
+  opacity: 1;
+}
+@keyframes gradient-rotate {
+  to { --gradient-angle: 360deg; }
+}
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ─── Infinite marquee for tech stack ─── */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 30s linear infinite;
+}
+.marquee-track-reverse {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 30s linear infinite reverse;
+}
+.marquee-track:hover,
+.marquee-track-reverse:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
@@ -13,6 +13,46 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Github, ExternalLink, Filter } from "lucide-react";
+
+/* ─── 3D Tilt Card Wrapper ─── */
+function TiltCard({ children, className, featured }: { children: React.ReactNode; className?: string; featured?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [transform, setTransform] = useState("");
+  const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 });
+
+  const handleMove = (e: React.MouseEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    const rotateX = (0.5 - y) * 12;
+    const rotateY = (x - 0.5) * 12;
+    setTransform(`perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02,1.02,1.02)`);
+    setGlare({ x: x * 100, y: y * 100, opacity: 0.15 });
+  };
+  const handleLeave = () => { setTransform(""); setGlare({ x: 50, y: 50, opacity: 0 }); };
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className={`relative ${featured ? "gradient-border-wrap" : ""} ${className || ""}`}
+      style={{ transform, transition: transform ? "transform 0.1s ease-out" : "transform 0.4s ease-out" }}
+    >
+      {children}
+      {/* Glare overlay */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-lg z-10"
+        style={{
+          background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,${glare.opacity}), transparent 60%)`,
+          transition: "opacity 0.2s",
+        }}
+      />
+    </div>
+  );
+}
 
 
 
@@ -98,6 +138,7 @@ export function ProjectsSection({ data }: { data?: ProjectData[] }) {
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 layout
               >
+                <TiltCard featured={project.featured}>
                 <Card className="h-full flex flex-col hover:border-primary/50 transition-all duration-300 group overflow-hidden">
                   {/* Project Image Placeholder */}
                   <div className="relative h-48 bg-gradient-to-br from-primary/5 to-primary/20 overflow-hidden">
@@ -166,6 +207,7 @@ export function ProjectsSection({ data }: { data?: ProjectData[] }) {
                     )}
                   </CardFooter>
                 </Card>
+                </TiltCard>
               </motion.div>
             ))}
           </AnimatePresence>

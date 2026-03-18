@@ -3,8 +3,89 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Download, Github, Linkedin } from "lucide-react";
+
+/* ─── Text Scramble Hook ─── */
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
+function useTextScramble(finalText: string, delay = 0) {
+  const [display, setDisplay] = useState("");
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    let frame = 0;
+    const totalFrames = 20;
+    const timeout = setTimeout(() => {
+      const iv = setInterval(() => {
+        frame++;
+        const progress = frame / totalFrames;
+        const revealed = Math.floor(progress * finalText.length);
+        let result = "";
+        for (let i = 0; i < finalText.length; i++) {
+          if (finalText[i] === " ") { result += " "; continue; }
+          result += i < revealed ? finalText[i] : chars[Math.floor(Math.random() * chars.length)];
+        }
+        setDisplay(result);
+        if (frame >= totalFrames) { clearInterval(iv); setDisplay(finalText); setDone(true); }
+      }, 40);
+      return () => clearInterval(iv);
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, [finalText, delay]);
+  return { display, done };
+}
+
+/* ─── Spotlight Dot Grid ─── */
+function SpotlightGrid() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouse = useRef({ x: -1000, y: -1000 });
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+    const gap = 40;
+    const radius = 120;
+    for (let x = gap; x < w; x += gap) {
+      for (let y = gap; y < h; y += gap) {
+        const dx = x - mouse.current.x;
+        const dy = y - mouse.current.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const intensity = Math.max(0, 1 - dist / radius);
+        const size = 1 + intensity * 2.5;
+        const alpha = 0.08 + intensity * 0.55;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(16, 185, 129, ${alpha})`;
+        ctx.fill();
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    let raf: number;
+    const loop = () => { draw(); raf = requestAnimationFrame(loop); };
+    loop();
+    const handleMove = (e: MouseEvent) => {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (rect) { mouse.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }; }
+    };
+    const handleLeave = () => { mouse.current = { x: -1000, y: -1000 }; };
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseleave", handleLeave);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("mousemove", handleMove); window.removeEventListener("mouseleave", handleLeave); };
+  }, [draw]);
+
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
+}
 
 interface HeroProps {
   settings?: {
@@ -18,38 +99,32 @@ interface HeroProps {
 }
 
 export function HeroSection({ settings }: HeroProps) {
+  const firstName = settings?.name?.split(" ")[0] || "Emmanuel";
+  const titleText = settings?.title || "Signal Processing & Machine Learning Engineer";
+  const taglineText = settings?.tagline || "Bridging the gap between signal theory and intelligent systems.";
+
+  const nameScramble = useTextScramble(firstName, 400);
+  const titleScramble = useTextScramble(titleText, 900);
+  const taglineScramble = useTextScramble(taglineText, 1400);
+
   return (
     <section
       id="home"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Animated background grid */}
+      {/* Interactive spotlight dot grid */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
+        <SpotlightGrid />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
         {/* Floating orbs */}
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/10 blur-3xl"
         />
         <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.1, 0.25, 0.1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-primary/10 blur-3xl"
         />
       </div>
@@ -73,31 +148,41 @@ export function HeroSection({ settings }: HeroProps) {
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
               className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6"
             >
               Hi, I&apos;m{" "}
-              <span className="text-primary">{settings?.name?.split(" ")[0] || "Emmanuel"}</span>
+              <span className="text-primary font-mono">{nameScramble.display || firstName}</span>
+              {nameScramble.done && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 1, 0] }}
+                  transition={{ duration: 0.8, repeat: Infinity }}
+                  className="text-primary"
+                >
+                  _
+                </motion.span>
+              )}
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.8 }}
               className="text-xl sm:text-2xl text-muted-foreground mb-4 font-light max-w-2xl"
             >
-              {settings?.title || "Signal Processing & Machine Learning Engineer"}
+              {titleScramble.display || titleText}
             </motion.p>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 1.3 }}
               className="text-base text-muted-foreground/80 mb-10 max-w-xl font-mono"
             >
-              {settings?.tagline || "Bridging the gap between signal theory and intelligent systems."}
+              {taglineScramble.display || taglineText}
               <br />
               MSc in Signal Processing &amp; Machine Learning.
             </motion.p>
@@ -105,7 +190,7 @@ export function HeroSection({ settings }: HeroProps) {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
+              transition={{ duration: 0.5, delay: 1.8 }}
               className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4"
             >
               <Button size="lg" asChild>
@@ -125,7 +210,7 @@ export function HeroSection({ settings }: HeroProps) {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
+              transition={{ duration: 0.5, delay: 2.0 }}
               className="flex items-center justify-center lg:justify-start gap-4 mt-8"
             >
               <a
