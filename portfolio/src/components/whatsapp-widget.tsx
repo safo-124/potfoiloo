@@ -18,12 +18,17 @@ export function WhatsAppWidget() {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
   const panelRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   // Close on outside click
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        panelRef.current && !panelRef.current.contains(target) &&
+        btnRef.current && !btnRef.current.contains(target)
+      ) {
         setOpen(false);
       }
     }
@@ -52,10 +57,13 @@ export function WhatsAppWidget() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50" ref={panelRef}>
+    <>
       {/* Chat panel */}
       {open && (
-        <div className="absolute bottom-16 right-0 w-[340px] rounded-2xl border border-border bg-card shadow-2xl shadow-black/20 overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
+        <div
+          ref={panelRef}
+          className="fixed bottom-24 right-6 z-50 w-[340px] rounded-2xl border border-border bg-card shadow-2xl shadow-black/20 overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200"
+        >
           {/* Header */}
           <div className="bg-[#075e54] px-4 py-3 flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -75,9 +83,9 @@ export function WhatsAppWidget() {
           </div>
 
           {/* Chat body */}
-          <div className="bg-[#0b141a] p-4 min-h-[120px]">
+          <div className="bg-[#0b141a] p-4">
             {/* Simulated incoming message */}
-            <div className="bg-[#1f2c34] rounded-lg rounded-tl-none px-3 py-2 max-w-[85%] mb-3">
+            <div className="bg-[#1f2c34] rounded-lg rounded-tl-none px-3 py-2 max-w-[85%]">
               <p className="text-sm text-white/90 leading-relaxed">
                 Hey there! 👋 Thanks for visiting my portfolio. How can I help you?
               </p>
@@ -91,7 +99,7 @@ export function WhatsAppWidget() {
           </div>
 
           {/* Message input */}
-          <div className="bg-[#1a2228] px-3 py-2 flex items-end gap-2">
+          <div className="bg-[#1a2228] px-3 py-3 flex items-end gap-2">
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -102,12 +110,12 @@ export function WhatsAppWidget() {
                 }
               }}
               placeholder="Type a message..."
-              rows={1}
-              className="flex-1 bg-[#2a3942] text-white text-sm rounded-lg px-3 py-2 resize-none focus:outline-none placeholder:text-white/40 max-h-24"
+              rows={2}
+              className="flex-1 bg-[#2a3942] text-white text-sm rounded-lg px-3 py-2.5 resize-none focus:outline-none placeholder:text-white/40 max-h-24"
             />
             <button
               onClick={handleSend}
-              className="h-9 w-9 rounded-full bg-[#00a884] hover:bg-[#00bf96] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+              className="h-10 w-10 rounded-full bg-[#00a884] hover:bg-[#00bf96] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
               aria-label="Send on WhatsApp"
             >
               <Send className="h-4 w-4 text-white" />
@@ -118,8 +126,9 @@ export function WhatsAppWidget() {
 
       {/* Floating button */}
       <button
+        ref={btnRef}
         onClick={() => setOpen((prev) => !prev)}
-        className="h-14 w-14 rounded-full bg-[#25d366] hover:bg-[#20bd5a] shadow-lg shadow-black/25 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
+        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-[#25d366] hover:bg-[#20bd5a] shadow-lg shadow-black/25 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
         aria-label="Chat on WhatsApp"
       >
         {open ? (
@@ -128,6 +137,6 @@ export function WhatsAppWidget() {
           <WhatsAppIcon className="h-7 w-7 text-white" />
         )}
       </button>
-    </div>
+    </>
   );
 }
