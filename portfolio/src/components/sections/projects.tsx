@@ -56,6 +56,46 @@ function TiltCard({ children, className, featured }: { children: React.ReactNode
 
 
 
+/* ─── Browser Frame Preview ─── */
+function BrowserFrame({ url, title }: { url: string; title: string }) {
+  return (
+    <div className="relative w-full overflow-hidden bg-muted/30">
+      {/* Browser toolbar */}
+      <div className="flex items-center gap-2 px-3 py-2 bg-muted/60 border-b border-border">
+        <div className="flex gap-1.5">
+          <div className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
+          <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/70" />
+          <div className="h-2.5 w-2.5 rounded-full bg-green-400/70" />
+        </div>
+        <div className="flex-1 mx-2">
+          <div className="bg-background/60 rounded-md px-3 py-0.5 text-[10px] text-muted-foreground truncate font-mono">
+            {url.replace(/^https?:\/\//, "")}
+          </div>
+        </div>
+      </div>
+      {/* Iframe viewport */}
+      <div className="relative w-full" style={{ height: "180px", overflow: "hidden" }}>
+        <iframe
+          src={url}
+          title={`Preview of ${title}`}
+          className="absolute top-0 left-0 border-0 pointer-events-none"
+          style={{
+            width: "1280px",
+            height: "800px",
+            transform: "scale(0.14)",
+            transformOrigin: "top left",
+          }}
+          loading="lazy"
+          sandbox="allow-scripts allow-same-origin"
+          tabIndex={-1}
+        />
+      </div>
+    </div>
+  );
+}
+
+
+
 interface ProjectData {
   title: string; slug: string; description: string; tags: string[];
   category: string; featured: boolean; imageUrl?: string | null;
@@ -140,7 +180,10 @@ export function ProjectsSection({ data }: { data?: ProjectData[] }) {
               >
                 <TiltCard featured={project.featured}>
                 <Card className="h-full flex flex-col hover:border-primary/50 transition-all duration-300 group overflow-hidden">
-                  {/* Project Image Placeholder */}
+                  {/* Project Preview */}
+                  {project.demoUrl ? (
+                    <BrowserFrame url={project.demoUrl} title={project.title} />
+                  ) : (
                   <div className="relative h-48 bg-gradient-to-br from-primary/5 to-primary/20 overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="text-6xl opacity-20 font-mono font-bold text-primary">
@@ -156,6 +199,7 @@ export function ProjectsSection({ data }: { data?: ProjectData[] }) {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
+                  )}
 
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg group-hover:text-primary transition-colors">
