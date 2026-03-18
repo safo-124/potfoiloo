@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Send } from "lucide-react";
 
-const PHONE_NUMBER = "233241abortyournum"; // Replace with your actual WhatsApp number (with country code, no + or spaces)
+const PHONE_NUMBER = "358449503156";
 const DEFAULT_MESSAGE = "Hi Emmanuel! I visited your portfolio and would like to connect.";
 
 function WhatsAppIcon({ className }: { className?: string }) {
