@@ -130,7 +130,7 @@ export function HeroSection({ settings }: HeroProps) {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-12 pt-20 lg:pt-0">
           {/* Text Content */}
           <div className="flex-1 text-center lg:text-left">
             <motion.div
@@ -138,12 +138,15 @@ export function HeroSection({ settings }: HeroProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-mono mb-6">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              {/* Redesigned status badge */}
+              <div className="inline-flex items-center gap-3 px-1.5 pr-5 py-1.5 rounded-full border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent backdrop-blur-sm text-sm font-mono mb-6 shadow-sm shadow-primary/5">
+                <span className="flex items-center justify-center h-7 w-7 rounded-full bg-primary/15 ring-1 ring-primary/30">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
                 </span>
-                Open to opportunities
+                <span className="text-primary font-medium tracking-wide">Available for work</span>
               </div>
             </motion.div>
 
@@ -151,7 +154,7 @@ export function HeroSection({ settings }: HeroProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.3 }}
-              className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6"
+              className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-4 sm:mb-6"
             >
               Hi, I&apos;m{" "}
               <span className="text-primary font-mono">{nameScramble.display || firstName}</span>
@@ -171,7 +174,7 @@ export function HeroSection({ settings }: HeroProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.8 }}
-              className="text-xl sm:text-2xl text-muted-foreground mb-4 font-light max-w-2xl"
+              className="text-lg sm:text-2xl text-muted-foreground mb-3 sm:mb-4 font-light max-w-2xl"
             >
               {titleScramble.display || titleText}
             </motion.p>
@@ -180,7 +183,7 @@ export function HeroSection({ settings }: HeroProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 1.3 }}
-              className="text-base text-muted-foreground/80 mb-10 max-w-xl font-mono"
+              className="text-sm sm:text-base text-muted-foreground/80 mb-8 sm:mb-10 max-w-xl font-mono"
             >
               {taglineScramble.display || taglineText}
               <br />
@@ -191,15 +194,15 @@ export function HeroSection({ settings }: HeroProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1.8 }}
-              className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4"
+              className="flex flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4"
             >
-              <Button size="lg" asChild>
+              <Button size="lg" className="text-sm sm:text-base" asChild>
                 <Link href="/projects">
                   View My Work
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" className="text-sm sm:text-base" asChild>
                 <a href={settings?.resumeUrl || "/resume.pdf"} target="_blank">
                   <Download className="mr-2 h-4 w-4" />
                   Download CV
@@ -211,13 +214,13 @@ export function HeroSection({ settings }: HeroProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 2.0 }}
-              className="flex items-center justify-center lg:justify-start gap-4 mt-8"
+              className="flex items-center justify-center lg:justify-start gap-4 mt-6 sm:mt-8"
             >
               <a
                 href={settings?.github || "https://github.com"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="p-2 rounded-lg border border-border bg-card/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-all"
               >
                 <Github className="h-5 w-5" />
               </a>
@@ -225,14 +228,14 @@ export function HeroSection({ settings }: HeroProps) {
                 href={settings?.linkedin || "https://linkedin.com"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="p-2 rounded-lg border border-border bg-card/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-all"
               >
                 <Linkedin className="h-5 w-5" />
               </a>
             </motion.div>
           </div>
 
-          {/* Profile Picture */}
+          {/* Profile Picture — shows FIRST on mobile (flex-col-reverse) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -243,7 +246,7 @@ export function HeroSection({ settings }: HeroProps) {
               {/* Glow ring */}
               <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-primary/60 via-primary/20 to-primary/60 blur-md opacity-70 animate-pulse" />
               {/* Image container */}
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden border-4 border-primary/30 shadow-2xl">
+              <div className="relative w-44 h-44 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden border-4 border-primary/30 shadow-2xl">
                 <Image
                   src="/profile_pic.jpg"
                   alt="Emmanuel Safo Acheampong"
