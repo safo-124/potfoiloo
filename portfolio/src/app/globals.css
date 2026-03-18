@@ -221,6 +221,12 @@
   display: none;
 }
 
+/* ─── Blog prose custom styling ─── */
+.prose-custom {
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
