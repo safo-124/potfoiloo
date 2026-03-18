@@ -9,11 +9,13 @@ export const metadata = {
 export default async function AboutPage() {
   let experiences: Awaited<ReturnType<typeof prisma.experience.findMany>> = [];
   let skills: Awaited<ReturnType<typeof prisma.skill.findMany>> = [];
+  let settings: Awaited<ReturnType<typeof prisma.siteSettings.findUnique>> = null;
   try {
-    experiences = await prisma.experience.findMany({ orderBy: { order: "asc" } });
-  } catch { /* empty */ }
-  try {
-    skills = await prisma.skill.findMany({ orderBy: { order: "asc" } });
+    [experiences, skills, settings] = await Promise.all([
+      prisma.experience.findMany({ orderBy: { order: "asc" } }),
+      prisma.skill.findMany({ orderBy: { order: "asc" } }),
+      prisma.siteSettings.findUnique({ where: { id: "main" } }),
+    ]);
   } catch { /* empty */ }
 
   const experienceData = experiences.map(e => ({
@@ -24,7 +26,7 @@ export default async function AboutPage() {
 
   return (
     <div className="pt-16">
-      <AboutSection />
+      <AboutSection settings={settings ?? undefined} skills={skills} />
       <ExperienceSection data={experienceData} />
       <SkillsSection data={skills} />
     </div>

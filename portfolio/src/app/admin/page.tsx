@@ -63,6 +63,11 @@ interface ContactMessage {
 interface Stats {
   projects: number; blogPosts: number; publications: number; messages: number;
 }
+interface SiteSettings {
+  id: string; name: string; title: string; tagline: string; about?: string;
+  avatarUrl?: string; resumeUrl?: string; email?: string; github?: string;
+  linkedin?: string; scholar?: string; twitter?: string;
+}
 
 // ─── Generic Form Modal ───────────────────────────────────────
 function FormModal({ title, open, onClose, onSubmit, children, loading }: {
@@ -107,6 +112,10 @@ export default function AdminPage() {
   const [publications, setPublications] = useState<Publication[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+  const [settingsForm, setSettingsForm] = useState<Record<string, string>>({});
+  const [savingSettings, setSavingSettings] = useState(false);
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -133,9 +142,10 @@ export default function AdminPage() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [statsRes, projRes, expRes, skillRes, pubRes, blogRes, msgRes] = await Promise.all([
+      const [statsRes, projRes, expRes, skillRes, pubRes, blogRes, msgRes, settingsRes] = await Promise.all([
         fetch("/api/stats"), fetch("/api/projects"), fetch("/api/experiences"),
         fetch("/api/skills"), fetch("/api/publications"), fetch("/api/blog"), fetch("/api/messages"),
+        fetch("/api/settings"),
       ]);
       if (statsRes.ok) setStats(await statsRes.json());
       if (projRes.ok) setProjects(await projRes.json());
@@ -144,6 +154,16 @@ export default function AdminPage() {
       if (pubRes.ok) setPublications(await pubRes.json());
       if (blogRes.ok) setBlogPosts(await blogRes.json());
       if (msgRes.ok) setMessages(await msgRes.json());
+      if (settingsRes.ok) {
+        const s = await settingsRes.json();
+        setSiteSettings(s);
+        setSettingsForm({
+          name: s.name || "", title: s.title || "", tagline: s.tagline || "",
+          about: s.about || "", avatarUrl: s.avatarUrl || "", resumeUrl: s.resumeUrl || "",
+          email: s.email || "", github: s.github || "", linkedin: s.linkedin || "",
+          scholar: s.scholar || "", twitter: s.twitter || "",
+        });
+      }
     } catch (err) { console.error("Failed to fetch data:", err); }
     setLoading(false);
   }, []);
@@ -202,6 +222,24 @@ export default function AdminPage() {
   };
 
   const setField = (key: string, value: unknown) => setFormData(prev => ({ ...prev, [key]: value }));
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settingsForm),
+      });
+      if (res.ok) {
+        const s = await res.json();
+        setSiteSettings(s);
+      }
+    } catch (err) { console.error("Failed to save settings:", err); }
+    setSavingSettings(false);
+  };
+  const setSettingsField = (key: string, value: string) => setSettingsForm(prev => ({ ...prev, [key]: value }));
 
   // ─── Login Screen ──────────────────────────────────────────
   if (!isAuthenticated) {
@@ -266,13 +304,14 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 mb-6">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-6">
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="experiences">Experience</TabsTrigger>
             <TabsTrigger value="skills">Skills</TabsTrigger>
             <TabsTrigger value="publications">Publications</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4 mr-1" /> Overview
             </TabsTrigger>
@@ -513,6 +552,75 @@ export default function AdminPage() {
           </TabsContent>
 
           {/* ── Overview Tab ──────────────────────────────── */}
+          {/* ── Settings Tab ──────────────────────────────── */}
+          <TabsContent value="settings">
+            <Card>
+              <CardHeader>
+                <CardTitle>Site Settings</CardTitle>
+                <CardDescription>Update your personal info, social links, and bio — these appear across the site</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSaveSettings} className="space-y-4 max-w-2xl">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Full Name</label>
+                      <Input value={settingsForm.name || ""} onChange={e => setSettingsField("name", e.target.value)} placeholder="Emmanuel Safo Acheampong" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Title / Role</label>
+                      <Input value={settingsForm.title || ""} onChange={e => setSettingsField("title", e.target.value)} placeholder="Signal Processing & ML Engineer" />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium">Tagline</label>
+                    <Input value={settingsForm.tagline || ""} onChange={e => setSettingsField("tagline", e.target.value)} placeholder="Bridging the gap between signal theory and intelligent systems" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium">About (bio paragraphs — separate with blank lines)</label>
+                    <Textarea className="min-h-[150px]" value={settingsForm.about || ""} onChange={e => setSettingsField("about", e.target.value)} placeholder="Write your bio here…" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Email</label>
+                      <Input value={settingsForm.email || ""} onChange={e => setSettingsField("email", e.target.value)} placeholder="you@example.com" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Avatar URL</label>
+                      <Input value={settingsForm.avatarUrl || ""} onChange={e => setSettingsField("avatarUrl", e.target.value)} placeholder="/profile_pic.jpg" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Resume / CV URL</label>
+                      <Input value={settingsForm.resumeUrl || ""} onChange={e => setSettingsField("resumeUrl", e.target.value)} placeholder="/resume.pdf" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">GitHub URL</label>
+                      <Input value={settingsForm.github || ""} onChange={e => setSettingsField("github", e.target.value)} placeholder="https://github.com/username" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">LinkedIn URL</label>
+                      <Input value={settingsForm.linkedin || ""} onChange={e => setSettingsField("linkedin", e.target.value)} placeholder="https://linkedin.com/in/username" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Google Scholar URL</label>
+                      <Input value={settingsForm.scholar || ""} onChange={e => setSettingsField("scholar", e.target.value)} placeholder="https://scholar.google.com/..." />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium">Twitter / X URL</label>
+                    <Input value={settingsForm.twitter || ""} onChange={e => setSettingsField("twitter", e.target.value)} placeholder="https://x.com/username" />
+                  </div>
+                  <Button type="submit" disabled={savingSettings}>
+                    {savingSettings ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save Settings</>}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="overview">
             <Card>
               <CardHeader><CardTitle>Overview</CardTitle><CardDescription>Quick summary of your portfolio content</CardDescription></CardHeader>

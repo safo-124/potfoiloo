@@ -16,7 +16,16 @@ import {
   Loader2,
 } from "lucide-react";
 
-export function ContactSection() {
+interface ContactProps {
+  settings?: {
+    email?: string | null;
+    github?: string | null;
+    linkedin?: string | null;
+    scholar?: string | null;
+  };
+}
+
+export function ContactSection({ settings }: ContactProps) {
   const [formState, setFormState] = useState<"idle" | "sending" | "sent">(
     "idle"
   );
@@ -97,10 +106,10 @@ export function ContactSection() {
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
                   <a
-                    href="mailto:emmanuel@example.com"
+                    href={`mailto:${settings?.email || "emmanuel@example.com"}`}
                     className="font-medium hover:text-primary transition-colors"
                   >
-                    emmanuel@example.com
+                    {settings?.email || "emmanuel@example.com"}
                   </a>
                 </div>
               </div>
@@ -122,7 +131,7 @@ export function ContactSection() {
               </p>
               <div className="flex gap-3">
                 <a
-                  href="https://github.com"
+                  href={settings?.github || "https://github.com"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 text-muted-foreground hover:text-primary transition-colors"
@@ -130,7 +139,7 @@ export function ContactSection() {
                   <Github className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://linkedin.com"
+                  href={settings?.linkedin || "https://linkedin.com"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 text-muted-foreground hover:text-primary transition-colors"
@@ -138,7 +147,7 @@ export function ContactSection() {
                   <Linkedin className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://scholar.google.com"
+                  href={settings?.scholar || "https://scholar.google.com"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 text-muted-foreground hover:text-primary transition-colors"

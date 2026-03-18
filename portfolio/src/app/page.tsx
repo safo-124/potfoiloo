@@ -6,24 +6,26 @@ export default async function Home() {
   let featuredProjects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
   let projectCount = 0;
   let pubCount = 0;
+  let settings: Awaited<ReturnType<typeof prisma.siteSettings.findUnique>> = null;
   try {
-    featuredProjects = await prisma.project.findMany({ where: { featured: true }, orderBy: { order: "asc" }, take: 3 });
-  } catch { /* empty */ }
-  try {
-    projectCount = await prisma.project.count();
-    pubCount = await prisma.publication.count();
+    [featuredProjects, projectCount, pubCount, settings] = await Promise.all([
+      prisma.project.findMany({ where: { featured: true }, orderBy: { order: "asc" }, take: 3 }),
+      prisma.project.count(),
+      prisma.publication.count(),
+      prisma.siteSettings.findUnique({ where: { id: "main" } }),
+    ]);
   } catch { /* empty */ }
 
-  const stats = projectCount > 0 ? {
+  const stats = {
     projects: `${projectCount}+`,
     publications: `${pubCount}`,
     yearsStudy: "6+",
     languages: "8+",
-  } : undefined;
+  };
 
   return (
     <>
-      <HeroSection />
+      <HeroSection settings={settings ?? undefined} />
       <HomePreview
         featuredProjectsData={featuredProjects.length > 0 ? featuredProjects : undefined}
         stats={stats}

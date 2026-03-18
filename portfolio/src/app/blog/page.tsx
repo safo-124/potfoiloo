@@ -11,45 +11,15 @@ export default async function BlogPage() {
     });
   } catch { /* empty */ }
 
-  // Fallback to placeholder posts if DB is empty
-  const posts = dbPosts.length > 0
-    ? dbPosts.map(p => ({
-        title: p.title,
-        slug: p.slug,
-        excerpt: p.excerpt,
-        tags: p.tags,
-        date: p.createdAt.toISOString().split("T")[0],
-        readTime: `${Math.max(1, Math.round(p.content.length / 1000))} min`,
-      }))
-    : [
-    {
-      title: "Understanding Fourier Transforms: From Theory to Python Implementation",
-      slug: "understanding-fourier-transforms",
-      excerpt:
-        "A deep dive into the Discrete Fourier Transform, its mathematical foundations, and how to implement it efficiently in Python with NumPy.",
-      tags: ["DSP", "Python", "Tutorial"],
-      date: "2025-12-15",
-      readTime: "8 min",
-    },
-    {
-      title: "Building a Real-Time Audio Classifier with PyTorch",
-      slug: "real-time-audio-classifier",
-      excerpt:
-        "Step-by-step guide to building and deploying a real-time audio classification system using mel spectrograms and a compact CNN architecture.",
-      tags: ["Deep Learning", "Audio", "PyTorch"],
-      date: "2025-11-28",
-      readTime: "12 min",
-    },
-    {
-      title: "Kalman Filters Explained: Tracking Moving Objects",
-      slug: "kalman-filters-tracking",
-      excerpt:
-        "An intuitive explanation of Kalman filters with practical examples in tracking applications. Includes Python code and visualizations.",
-      tags: ["Signal Processing", "Python", "Tutorial"],
-      date: "2025-10-10",
-      readTime: "10 min",
-    },
-  ];
+  // Map DB posts to display format — no fallback
+  const posts = dbPosts.map(p => ({
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    tags: p.tags,
+    date: p.createdAt.toISOString().split("T")[0],
+    readTime: `${Math.max(1, Math.round(p.content.length / 1000))} min`,
+  }));
 
   return (
     <div className="min-h-screen pt-24 pb-16">
@@ -67,6 +37,9 @@ export default async function BlogPage() {
           Technical articles on signal processing, machine learning, and more.
         </p>
 
+        {posts.length === 0 ? (
+          <p className="text-center text-muted-foreground py-12">No blog posts published yet. Check back soon!</p>
+        ) : (
         <div className="space-y-8">
           {posts.map((post) => (
             <Link key={post.slug} href={`/blog/${post.slug}`}>
@@ -100,6 +73,7 @@ export default async function BlogPage() {
             </Link>
           ))}
         </div>
+        )}
       </div>
     </div>
   );

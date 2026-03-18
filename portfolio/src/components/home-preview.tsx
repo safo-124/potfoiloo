@@ -24,29 +24,6 @@ import {
   Mail,
 } from "lucide-react";
 
-const featuredProjects = [
-  {
-    title: "Neural Speech Enhancement",
-    description:
-      "Deep learning-based speech denoising using U-Net with attention mechanisms.",
-    tags: ["Deep Learning", "Signal Processing", "PyTorch"],
-    category: "Signal Processing",
-  },
-  {
-    title: "Adaptive Beamforming with DNN",
-    description:
-      "Hybrid beamforming combining MVDR with deep neural networks for spatial filtering.",
-    tags: ["Signal Processing", "Deep Learning", "MATLAB"],
-    category: "Signal Processing",
-  },
-  {
-    title: "Real-time Object Detection",
-    description:
-      "Optimized YOLOv8 for edge deployment achieving 30 FPS on Jetson Nano.",
-    tags: ["Computer Vision", "Deep Learning", "TensorRT"],
-    category: "Computer Vision",
-  },
-];
 
 const highlights = [
   { icon: Radio, title: "Signal Processing", color: "text-emerald-500" },
@@ -61,7 +38,7 @@ interface HomePreviewProps {
 }
 
 export function HomePreview({ featuredProjectsData, stats: statsData }: HomePreviewProps) {
-  const displayProjects = featuredProjectsData && featuredProjectsData.length > 0 ? featuredProjectsData : featuredProjects;
+  const displayProjects = featuredProjectsData ?? [];
   return (
     <>
       {/* About Preview */}
@@ -117,6 +94,7 @@ export function HomePreview({ featuredProjectsData, stats: statsData }: HomePrev
       </section>
 
       {/* Featured Projects Preview */}
+      {displayProjects.length > 0 && (
       <section className="py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -186,14 +164,15 @@ export function HomePreview({ featuredProjectsData, stats: statsData }: HomePrev
           </div>
         </div>
       </section>
+      )}
 
       {/* Quick Stats / CTA Row */}
       <section className="py-20 bg-card/50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
             {[
-              { icon: Briefcase, label: "Projects", value: statsData?.projects || "6+" },
-              { icon: BookOpen, label: "Publications", value: statsData?.publications || "3" },
+              { icon: Briefcase, label: "Projects", value: statsData?.projects || "0" },
+              { icon: BookOpen, label: "Publications", value: statsData?.publications || "0" },
               { icon: GraduationCap, label: "Years Study", value: statsData?.yearsStudy || "6+" },
               { icon: Code2, label: "Languages", value: statsData?.languages || "8+" },
             ].map((stat, i) => (

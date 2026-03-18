@@ -32,24 +32,23 @@ const highlights = [
   },
 ];
 
-const techStack = [
-  "Python",
-  "PyTorch",
-  "TensorFlow",
-  "MATLAB",
-  "Scikit-learn",
-  "NumPy",
-  "Pandas",
-  "OpenCV",
-  "C++",
-  "Docker",
-  "Git",
-  "SQL",
-  "Next.js",
-  "TypeScript",
-];
+interface SiteSettingsData {
+  name?: string | null;
+  title?: string | null;
+  about?: string | null;
+  avatarUrl?: string | null;
+}
 
-export function AboutSection() {
+interface AboutProps {
+  settings?: SiteSettingsData;
+  skills?: { name: string; category: string }[];
+}
+
+export function AboutSection({ settings, skills }: AboutProps) {
+  const techStack = skills && skills.length > 0
+    ? Array.from(new Set(skills.map(s => s.name)))
+    : [];
+
   return (
     <section id="about" className="py-24 bg-card/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -80,36 +79,47 @@ export function AboutSection() {
             {/* Profile Picture */}
             <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-2xl overflow-hidden border-2 border-primary/20 shadow-xl mb-8">
               <Image
-                src="/profile_pic.jpg"
-                alt="Emmanuel Safo Acheampong"
+                src={settings?.avatarUrl || "/profile_pic.jpg"}
+                alt={settings?.name || "Emmanuel Safo Acheampong"}
                 fill
                 className="object-cover"
               />
             </div>
 
             <div className="prose prose-lg dark:prose-invert">
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                I am a Masters graduate in Signal Processing and Machine
-                Learning with a deep passion for transforming raw data into
-                actionable intelligence. My research bridges classical signal
-                processing techniques with modern deep learning approaches.
-              </p>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                During my Masters, I focused on developing novel algorithms that
-                combine the mathematical rigor of DSP with the learning power of
-                neural networks. My work spans areas including adaptive
-                filtering, speech enhancement, image processing, and predictive
-                modeling.
-              </p>
-              <p className="text-muted-foreground leading-relaxed mb-8">
-                I&apos;m passionate about building systems that listen, see, and
-                understand — turning signals into insights that make a real
-                difference. When I&apos;m not coding, you&apos;ll find me
-                reading research papers or exploring new datasets.
-              </p>
+              {settings?.about ? (
+                settings.about.split("\n\n").map((paragraph, i) => (
+                  <p key={i} className="text-muted-foreground leading-relaxed mb-6">
+                    {paragraph}
+                  </p>
+                ))
+              ) : (
+                <>
+                  <p className="text-muted-foreground leading-relaxed mb-6">
+                    I am a Masters graduate in Signal Processing and Machine
+                    Learning with a deep passion for transforming raw data into
+                    actionable intelligence. My research bridges classical signal
+                    processing techniques with modern deep learning approaches.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-6">
+                    During my Masters, I focused on developing novel algorithms that
+                    combine the mathematical rigor of DSP with the learning power of
+                    neural networks. My work spans areas including adaptive
+                    filtering, speech enhancement, image processing, and predictive
+                    modeling.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-8">
+                    I&apos;m passionate about building systems that listen, see, and
+                    understand — turning signals into insights that make a real
+                    difference. When I&apos;m not coding, you&apos;ll find me
+                    reading research papers or exploring new datasets.
+                  </p>
+                </>
+              )}
             </div>
 
             {/* Tech Stack */}
+            {techStack.length > 0 && (
             <div>
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                 Tech Stack
@@ -122,6 +132,7 @@ export function AboutSection() {
                 ))}
               </div>
             </div>
+            )}
           </motion.div>
 
           {/* Highlight Cards */}

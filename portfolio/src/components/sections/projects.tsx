@@ -14,85 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Github, ExternalLink, Filter } from "lucide-react";
 
-const categories = [
-  "All",
-  "Machine Learning",
-  "Signal Processing",
-  "Computer Vision",
-  "Deep Learning",
-  "NLP",
-];
 
-const projects = [
-  {
-    title: "Neural Speech Enhancement",
-    slug: "neural-speech-enhancement",
-    description:
-      "Deep learning-based speech denoising system using a U-Net architecture with attention mechanisms. Achieves state-of-the-art PESQ scores on the VoiceBank-DEMAND dataset.",
-    tags: ["Deep Learning", "Signal Processing", "PyTorch", "Audio"],
-    category: "Signal Processing",
-    featured: true,
-    imageUrl: "/projects/speech-enhancement.png",
-    demoUrl: "https://demo.example.com",
-    githubUrl: "https://github.com",
-  },
-  {
-    title: "Adaptive Beamforming with DNN",
-    slug: "adaptive-beamforming",
-    description:
-      "Novel beamforming algorithm combining MVDR with deep neural networks for robust spatial filtering in multi-source environments.",
-    tags: ["Signal Processing", "Deep Learning", "MATLAB", "Python"],
-    category: "Signal Processing",
-    featured: true,
-    imageUrl: "/projects/beamforming.png",
-    githubUrl: "https://github.com",
-  },
-  {
-    title: "Real-time Object Detection System",
-    slug: "object-detection",
-    description:
-      "Optimized YOLOv8 model for real-time object detection on edge devices. Achieved 30 FPS on Jetson Nano with minimal accuracy loss.",
-    tags: ["Computer Vision", "Deep Learning", "Python", "TensorRT"],
-    category: "Computer Vision",
-    featured: true,
-    imageUrl: "/projects/object-detection.png",
-    demoUrl: "https://demo.example.com",
-    githubUrl: "https://github.com",
-  },
-  {
-    title: "EEG Signal Classification",
-    slug: "eeg-classification",
-    description:
-      "CNN-LSTM hybrid model for classifying EEG signals into different mental states. Used for brain-computer interface applications.",
-    tags: ["Machine Learning", "Signal Processing", "TensorFlow", "BCI"],
-    category: "Machine Learning",
-    featured: false,
-    imageUrl: "/projects/eeg.png",
-    githubUrl: "https://github.com",
-  },
-  {
-    title: "Sentiment Analysis Pipeline",
-    slug: "sentiment-analysis",
-    description:
-      "End-to-end NLP pipeline for multi-language sentiment analysis using fine-tuned BERT models with custom tokenization.",
-    tags: ["NLP", "Deep Learning", "Transformers", "Python"],
-    category: "NLP",
-    featured: false,
-    imageUrl: "/projects/sentiment.png",
-    githubUrl: "https://github.com",
-  },
-  {
-    title: "Wavelet-based Image Denoising",
-    slug: "wavelet-denoising",
-    description:
-      "Advanced image denoising technique using wavelet decomposition combined with learned thresholding via a lightweight CNN.",
-    tags: ["Signal Processing", "Computer Vision", "MATLAB", "Python"],
-    category: "Computer Vision",
-    featured: false,
-    imageUrl: "/projects/wavelet.png",
-    githubUrl: "https://github.com",
-  },
-];
 
 interface ProjectData {
   title: string; slug: string; description: string; tags: string[];
@@ -102,7 +24,21 @@ interface ProjectData {
 
 export function ProjectsSection({ data }: { data?: ProjectData[] }) {
   const [filter, setFilter] = useState("All");
-  const allProjects = data && data.length > 0 ? data : projects;
+  const allProjects = data ?? [];
+  const categories = ["All", ...Array.from(new Set(allProjects.map(p => p.category)))];
+
+  if (allProjects.length === 0) {
+    return (
+      <section id="projects" className="py-24 bg-card/50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            Featured <span className="text-primary">Projects</span>
+          </h2>
+          <p className="text-muted-foreground">Projects will appear here once added via the admin dashboard.</p>
+        </div>
+      </section>
+    );
+  }
 
   const filteredProjects =
     filter === "All"

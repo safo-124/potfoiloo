@@ -6,7 +6,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Download, Github, Linkedin } from "lucide-react";
 
-export function HeroSection() {
+interface HeroProps {
+  settings?: {
+    name?: string | null;
+    title?: string | null;
+    tagline?: string | null;
+    github?: string | null;
+    linkedin?: string | null;
+    resumeUrl?: string | null;
+  };
+}
+
+export function HeroSection({ settings }: HeroProps) {
   return (
     <section
       id="home"
@@ -68,7 +79,7 @@ export function HeroSection() {
               className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6"
             >
               Hi, I&apos;m{" "}
-              <span className="text-primary">Emmanuel</span>
+              <span className="text-primary">{settings?.name?.split(" ")[0] || "Emmanuel"}</span>
             </motion.h1>
 
             <motion.p
@@ -77,7 +88,7 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-xl sm:text-2xl text-muted-foreground mb-4 font-light max-w-2xl"
             >
-              Signal Processing & Machine Learning Engineer
+              {settings?.title || "Signal Processing & Machine Learning Engineer"}
             </motion.p>
 
             <motion.p
@@ -86,7 +97,7 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="text-base text-muted-foreground/80 mb-10 max-w-xl font-mono"
             >
-              Bridging the gap between signal theory and intelligent systems.
+              {settings?.tagline || "Bridging the gap between signal theory and intelligent systems."}
               <br />
               MSc in Signal Processing &amp; Machine Learning.
             </motion.p>
@@ -104,7 +115,7 @@ export function HeroSection() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <a href="/resume.pdf" target="_blank">
+                <a href={settings?.resumeUrl || "/resume.pdf"} target="_blank">
                   <Download className="mr-2 h-4 w-4" />
                   Download CV
                 </a>
@@ -118,7 +129,7 @@ export function HeroSection() {
               className="flex items-center justify-center lg:justify-start gap-4 mt-8"
             >
               <a
-                href="https://github.com"
+                href={settings?.github || "https://github.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
@@ -126,7 +137,7 @@ export function HeroSection() {
                 <Github className="h-5 w-5" />
               </a>
               <a
-                href="https://linkedin.com"
+                href={settings?.linkedin || "https://linkedin.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"

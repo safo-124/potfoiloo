@@ -12,43 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileText, ExternalLink, BookOpen } from "lucide-react";
 
-const publications = [
-  {
-    title:
-      "Deep Neural Network-Based Adaptive Filtering for Real-Time Speech Enhancement",
-    authors: "E. S. Acheampong, J. Smith, A. Johnson",
-    venue: "IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)",
-    year: 2025,
-    type: "conference",
-    abstract:
-      "We propose a novel adaptive filtering framework that leverages deep neural networks for real-time speech enhancement in non-stationary noise environments...",
-    doi: "10.1109/ICASSP.2025.XXXXXX",
-    pdfUrl: "#",
-  },
-  {
-    title:
-      "Hybrid Beamforming with Learned Spatial Filters for Multi-Source Environments",
-    authors: "E. S. Acheampong, R. Williams",
-    venue: "IEEE Signal Processing Letters",
-    year: 2024,
-    type: "journal",
-    abstract:
-      "This letter presents a hybrid beamforming approach that combines classical MVDR with learned spatial filters for improved source separation...",
-    doi: "10.1109/LSP.2024.XXXXXX",
-    pdfUrl: "#",
-  },
-  {
-    title:
-      "Neural Network Approaches to Adaptive Signal Processing: A Comprehensive Study",
-    authors: "E. S. Acheampong",
-    venue: "MSc Thesis, University Name",
-    year: 2025,
-    type: "thesis",
-    abstract:
-      "This thesis explores the intersection of classical adaptive signal processing and modern deep learning techniques, presenting novel algorithms for speech enhancement, beamforming, and interference cancellation...",
-    pdfUrl: "#",
-  },
-];
+
 
 const typeStyles = {
   conference: "bg-blue-500/10 text-blue-500",
@@ -62,7 +26,21 @@ interface PublicationData {
 }
 
 export function PublicationsSection({ data }: { data?: PublicationData[] }) {
-  const allPublications = data && data.length > 0 ? data : publications;
+  const allPublications = data ?? [];
+
+  if (allPublications.length === 0) {
+    return (
+      <section id="publications" className="py-24 bg-card/50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            Publications & <span className="text-primary">Research</span>
+          </h2>
+          <p className="text-muted-foreground">Publications will appear here once added via the admin dashboard.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="publications" className="py-24 bg-card/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">

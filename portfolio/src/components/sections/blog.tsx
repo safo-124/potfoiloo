@@ -12,35 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Clock } from "lucide-react";
 import Link from "next/link";
 
-const blogPosts = [
-  {
-    title: "Understanding Fourier Transforms: From Theory to Python Implementation",
-    slug: "understanding-fourier-transforms",
-    excerpt:
-      "A deep dive into the Discrete Fourier Transform, its mathematical foundations, and how to implement it efficiently in Python with NumPy.",
-    tags: ["DSP", "Python", "Tutorial"],
-    date: "2025-12-15",
-    readTime: "8 min",
-  },
-  {
-    title: "Building a Real-Time Audio Classifier with PyTorch",
-    slug: "real-time-audio-classifier",
-    excerpt:
-      "Step-by-step guide to building and deploying a real-time audio classification system using mel spectrograms and a compact CNN architecture.",
-    tags: ["Deep Learning", "Audio", "PyTorch"],
-    date: "2025-11-28",
-    readTime: "12 min",
-  },
-  {
-    title: "Kalman Filters Explained: Tracking Moving Objects",
-    slug: "kalman-filters-tracking",
-    excerpt:
-      "An intuitive explanation of Kalman filters with practical examples in tracking applications. Includes Python code and visualizations.",
-    tags: ["Signal Processing", "Python", "Tutorial"],
-    date: "2025-10-10",
-    readTime: "10 min",
-  },
-];
+
 
 interface BlogPostData {
   title: string; slug: string; excerpt: string;
@@ -49,11 +21,25 @@ interface BlogPostData {
 }
 
 export function BlogSection({ data }: { data?: BlogPostData[] }) {
-  const allPosts = data && data.length > 0 ? data.map(p => ({
+  const allPosts = data ? data.map(p => ({
     ...p,
     date: p.date || p.createdAt || new Date().toISOString(),
     readTime: p.readTime || "5 min",
-  })) : blogPosts;
+  })) : [];
+
+  if (allPosts.length === 0) {
+    return (
+      <section id="blog" className="py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            Latest <span className="text-primary">Articles</span>
+          </h2>
+          <p className="text-muted-foreground">Blog posts will appear here once published via the admin dashboard.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="blog" className="py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">

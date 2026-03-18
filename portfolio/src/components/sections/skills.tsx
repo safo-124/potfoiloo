@@ -4,62 +4,7 @@ import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
-const skillCategories = [
-  {
-    id: "languages",
-    label: "Languages",
-    skills: [
-      { name: "Python", level: 95 },
-      { name: "MATLAB", level: 90 },
-      { name: "C/C++", level: 75 },
-      { name: "TypeScript", level: 70 },
-      { name: "SQL", level: 70 },
-      { name: "R", level: 60 },
-    ],
-  },
-  {
-    id: "frameworks",
-    label: "Frameworks & Libraries",
-    skills: [
-      { name: "PyTorch", level: 90 },
-      { name: "TensorFlow/Keras", level: 85 },
-      { name: "Scikit-learn", level: 90 },
-      { name: "NumPy/SciPy", level: 95 },
-      { name: "Pandas", level: 90 },
-      { name: "OpenCV", level: 80 },
-      { name: "Hugging Face", level: 75 },
-      { name: "Next.js/React", level: 65 },
-    ],
-  },
-  {
-    id: "tools",
-    label: "Tools & Platforms",
-    skills: [
-      { name: "Git/GitHub", level: 90 },
-      { name: "Docker", level: 75 },
-      { name: "Linux", level: 80 },
-      { name: "Jupyter", level: 95 },
-      { name: "VS Code", level: 90 },
-      { name: "AWS/GCP", level: 60 },
-      { name: "Weights & Biases", level: 70 },
-      { name: "LaTeX", level: 85 },
-    ],
-  },
-  {
-    id: "domains",
-    label: "Domain Expertise",
-    skills: [
-      { name: "Digital Signal Processing", level: 95 },
-      { name: "Deep Learning", level: 90 },
-      { name: "Computer Vision", level: 80 },
-      { name: "Speech/Audio Processing", level: 85 },
-      { name: "Statistical Modeling", level: 85 },
-      { name: "Time-Series Analysis", level: 80 },
-      { name: "Natural Language Processing", level: 70 },
-      { name: "Embedded Systems", level: 65 },
-    ],
-  },
-];
+
 
 function SkillBar({ name, level, delay }: { name: string; level: number; delay: number }) {
   return (
@@ -112,7 +57,21 @@ function groupSkillsIntoCategories(skills: SkillData[]): SkillCategory[] {
 }
 
 export function SkillsSection({ data }: { data?: SkillData[] }) {
-  const categories = data && data.length > 0 ? groupSkillsIntoCategories(data) : skillCategories;
+  const categories = data ? groupSkillsIntoCategories(data) : [];
+
+  if (categories.length === 0) {
+    return (
+      <section id="skills" className="py-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            Technical <span className="text-primary">Skills</span>
+          </h2>
+          <p className="text-muted-foreground">Skills will appear here once added via the admin dashboard.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="skills" className="py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -139,7 +98,7 @@ export function SkillsSection({ data }: { data?: SkillData[] }) {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto"
         >
-          <Tabs defaultValue="languages" className="w-full">
+          <Tabs defaultValue={categories[0]?.id} className="w-full">
             <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-8">
               {categories.map((cat) => (
                 <TabsTrigger key={cat.id} value={cat.id}>
