@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
@@ -58,6 +58,19 @@ function TiltCard({ children, className, featured }: { children: React.ReactNode
 
 /* ─── Browser Frame Preview ─── */
 function BrowserFrame({ url, title }: { url: string; title: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.3);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const measure = () => setScale(el.offsetWidth / 1280);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
     <div className="relative w-full overflow-hidden bg-muted/30">
       {/* Browser toolbar */}
@@ -73,8 +86,12 @@ function BrowserFrame({ url, title }: { url: string; title: string }) {
           </div>
         </div>
       </div>
-      {/* Iframe viewport */}
-      <div className="relative w-full" style={{ height: "180px", overflow: "hidden" }}>
+      {/* Iframe viewport — scales to fill container width */}
+      <div
+        ref={containerRef}
+        className="relative w-full overflow-hidden"
+        style={{ height: `${800 * scale}px` }}
+      >
         <iframe
           src={url}
           title={`Preview of ${title}`}
@@ -82,7 +99,7 @@ function BrowserFrame({ url, title }: { url: string; title: string }) {
           style={{
             width: "1280px",
             height: "800px",
-            transform: "scale(0.14)",
+            transform: `scale(${scale})`,
             transformOrigin: "top left",
           }}
           loading="lazy"
