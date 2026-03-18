@@ -102,3 +102,15 @@ model SiteSettings {
   scholar     String?
   twitter     String?
 }
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  role      String   // e.g. "Senior Engineer at Danaos"
+  content   String   @db.Text
+  avatar    String?
+  rating    Int      @default(5) // 1-5
+  featured  Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}

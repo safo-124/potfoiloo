@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
@@ -242,6 +243,11 @@ export function ProjectsSection({ data }: { data?: ProjectData[] }) {
                   </CardContent>
 
                   <CardFooter className="gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/projects/${project.slug}`}>
+                        View Details
+                      </Link>
+                    </Button>
                     {project.githubUrl && (
                       <Button variant="outline" size="sm" asChild>
                         <a

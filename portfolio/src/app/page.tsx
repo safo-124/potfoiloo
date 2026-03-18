@@ -1,8 +1,9 @@
 import { HeroSection } from "@/components/sections";
 import { HomePreview } from "@/components/home-preview";
+import TestimonialsSection from "@/components/sections/testimonials";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function Home() {
   let featuredProjects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
@@ -32,6 +33,7 @@ export default async function Home() {
         featuredProjectsData={featuredProjects.length > 0 ? featuredProjects : undefined}
         stats={stats}
       />
+      <TestimonialsSection />
     </>
   );
 }

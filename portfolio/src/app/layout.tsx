@@ -29,6 +29,26 @@ export const metadata: Metadata = {
     "Portfolio",
     "Emmanuel Safo Acheampong",
   ],
+  metadataBase: new URL("https://portfoilo-two-ivory.vercel.app"),
+  openGraph: {
+    title: "Emmanuel Safo Acheampong | Signal Processing & ML Engineer",
+    description:
+      "Signal Processing and Machine Learning Engineer. Explore my projects, research, and technical blog.",
+    url: "https://portfoilo-two-ivory.vercel.app",
+    siteName: "ESA Portfolio",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Emmanuel Safo Acheampong | Signal Processing & ML Engineer",
+    description:
+      "Signal Processing and Machine Learning Engineer. Explore my projects, research, and technical blog.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

@@ -1,7 +1,7 @@
 import { ProjectsSection } from "@/components/sections";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export const metadata = {
   title: "Projects | Emmanuel Safo Acheampong",
