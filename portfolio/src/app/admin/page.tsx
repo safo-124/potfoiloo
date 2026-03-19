@@ -19,6 +19,11 @@ import {
   GraduationCap,
   FlaskConical,
   BarChart3,
+  Globe,
+  Monitor,
+  Smartphone,
+  Tablet,
+  Activity,
 } from "lucide-react";
 import {
   Card,
@@ -62,6 +67,16 @@ interface ContactMessage {
 }
 interface Stats {
   projects: number; blogPosts: number; publications: number; messages: number;
+}
+interface AnalyticsData {
+  totalViews: number;
+  viewsPerDay: { date: string; count: number }[];
+  topPages: { path: string; count: number }[];
+  devices: { device: string; count: number }[];
+  browsers: { browser: string; count: number }[];
+  oses: { os: string; count: number }[];
+  countries: { country: string; count: number }[];
+  recentViews: { id: string; path: string; device: string; browser: string; os: string; country: string; referrer: string | null; createdAt: string }[];
 }
 interface SiteSettings {
   id: string; name: string; title: string; tagline: string; about?: string;
@@ -114,6 +129,9 @@ export default function AdminPage() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [analyticsDays, setAnalyticsDays] = useState(30);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [settingsForm, setSettingsForm] = useState<Record<string, string>>({});
   const [savingSettings, setSavingSettings] = useState(false);
 
@@ -168,9 +186,18 @@ export default function AdminPage() {
     setLoading(false);
   }, []);
 
+  const fetchAnalytics = useCallback(async (days = 30) => {
+    setAnalyticsLoading(true);
+    try {
+      const res = await fetch(`/api/analytics?days=${days}`);
+      if (res.ok) setAnalytics(await res.json());
+    } catch (err) { console.error("Failed to fetch analytics:", err); }
+    setAnalyticsLoading(false);
+  }, []);
+
   useEffect(() => {
-    if (isAuthenticated) fetchAll();
-  }, [isAuthenticated, fetchAll]);
+    if (isAuthenticated) { fetchAll(); fetchAnalytics(analyticsDays); }
+  }, [isAuthenticated, fetchAll, fetchAnalytics, analyticsDays]);
 
   // CRUD helpers
   const openCreate = (type: string, defaults: Record<string, unknown> = {}) => {
@@ -268,6 +295,7 @@ export default function AdminPage() {
     { label: "Blog Posts", value: stats.blogPosts, icon: PenTool },
     { label: "Publications", value: stats.publications, icon: BookOpen },
     { label: "Messages", value: stats.messages, icon: MessageSquare },
+    { label: "Page Views", value: analytics?.totalViews ?? 0, icon: Activity },
   ];
 
   return (
@@ -282,7 +310,7 @@ export default function AdminPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {statCards.map((stat, index) => (
             <motion.div key={stat.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
               <Card>
@@ -304,13 +332,16 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-6">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9 mb-6">
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="experiences">Experience</TabsTrigger>
             <TabsTrigger value="skills">Skills</TabsTrigger>
             <TabsTrigger value="publications">Publications</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
+            <TabsTrigger value="analytics">
+              <Activity className="h-4 w-4 mr-1" /> Analytics
+            </TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4 mr-1" /> Overview
@@ -551,7 +582,153 @@ export default function AdminPage() {
             </Card>
           </TabsContent>
 
-          {/* ── Overview Tab ──────────────────────────────── */}
+          {/* ── Analytics Tab ─────────────────────────────── */}
+          <TabsContent value="analytics">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div><CardTitle>Site Analytics</CardTitle><CardDescription>Track visitors, devices, and page views</CardDescription></div>
+                <div className="flex gap-2">
+                  {[7, 30, 90].map(d => (
+                    <Button key={d} variant={analyticsDays === d ? "default" : "outline"} size="sm" onClick={() => setAnalyticsDays(d)}>{d}d</Button>
+                  ))}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {analyticsLoading ? (
+                  <div className="flex items-center justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : !analytics || analytics.totalViews === 0 ? (
+                  <p className="text-muted-foreground text-center py-12">No page views recorded yet. Visit your site to start tracking!</p>
+                ) : (
+                  <div className="space-y-8">
+                    {/* Total Views */}
+                    <div className="text-center p-6 rounded-xl border border-border bg-primary/5">
+                      <p className="text-4xl font-bold text-primary">{analytics.totalViews.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground mt-1">Total page views (last {analyticsDays} days)</p>
+                    </div>
+
+                    {/* Views per day chart */}
+                    {analytics.viewsPerDay.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold mb-3">Views per Day</h3>
+                        <div className="flex items-end gap-1 h-32">
+                          {analytics.viewsPerDay.map((d) => {
+                            const max = Math.max(...analytics.viewsPerDay.map(v => v.count), 1);
+                            const pct = (d.count / max) * 100;
+                            return (
+                              <div key={d.date} className="flex-1 flex flex-col items-center gap-1" title={`${d.date}: ${d.count} views`}>
+                                <span className="text-[10px] text-muted-foreground">{d.count}</span>
+                                <div className="w-full bg-primary/80 rounded-t" style={{ height: `${Math.max(pct, 4)}%` }} />
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex justify-between mt-1">
+                          <span className="text-[10px] text-muted-foreground">{analytics.viewsPerDay[0]?.date}</span>
+                          <span className="text-[10px] text-muted-foreground">{analytics.viewsPerDay[analytics.viewsPerDay.length - 1]?.date}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Grid: Top Pages + Devices + Browsers + OS + Countries */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Top Pages */}
+                      <div>
+                        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><Globe className="h-4 w-4" />Top Pages</h3>
+                        <div className="space-y-2">
+                          {analytics.topPages.map((p) => (
+                            <div key={p.path} className="flex items-center justify-between text-sm p-2 rounded border border-border">
+                              <span className="font-mono text-xs truncate mr-2">{p.path}</span>
+                              <Badge variant="secondary">{p.count}</Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Devices */}
+                      <div>
+                        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><Monitor className="h-4 w-4" />Devices</h3>
+                        <div className="space-y-2">
+                          {analytics.devices.map((d) => {
+                            const Icon = d.device === "mobile" ? Smartphone : d.device === "tablet" ? Tablet : Monitor;
+                            const pct = analytics.totalViews > 0 ? Math.round((d.count / analytics.totalViews) * 100) : 0;
+                            return (
+                              <div key={d.device} className="p-3 rounded border border-border">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="flex items-center gap-2 text-sm capitalize"><Icon className="h-4 w-4" />{d.device}</span>
+                                  <span className="text-sm font-medium">{d.count} ({pct}%)</span>
+                                </div>
+                                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                  <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Browsers */}
+                      <div>
+                        <h3 className="text-sm font-semibold mb-3">Browsers</h3>
+                        <div className="space-y-2">
+                          {analytics.browsers.map((b) => (
+                            <div key={b.browser} className="flex items-center justify-between text-sm p-2 rounded border border-border">
+                              <span>{b.browser}</span>
+                              <Badge variant="secondary">{b.count}</Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Countries */}
+                      <div>
+                        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><Globe className="h-4 w-4" />Countries</h3>
+                        <div className="space-y-2">
+                          {analytics.countries.map((c) => (
+                            <div key={c.country} className="flex items-center justify-between text-sm p-2 rounded border border-border">
+                              <span>{c.country === "unknown" ? "Unknown" : c.country}</span>
+                              <Badge variant="secondary">{c.count}</Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Recent Visits Table */}
+                    <div>
+                      <h3 className="text-sm font-semibold mb-3">Recent Visits (last 50)</h3>
+                      <div className="overflow-x-auto rounded-lg border border-border">
+                        <table className="w-full text-sm">
+                          <thead className="bg-muted/50">
+                            <tr>
+                              <th className="text-left p-2 font-medium">Page</th>
+                              <th className="text-left p-2 font-medium">Device</th>
+                              <th className="text-left p-2 font-medium">Browser</th>
+                              <th className="text-left p-2 font-medium">OS</th>
+                              <th className="text-left p-2 font-medium">Country</th>
+                              <th className="text-left p-2 font-medium">Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {analytics.recentViews.map((v) => (
+                              <tr key={v.id} className="border-t border-border">
+                                <td className="p-2 font-mono text-xs">{v.path}</td>
+                                <td className="p-2 capitalize">{v.device}</td>
+                                <td className="p-2">{v.browser}</td>
+                                <td className="p-2">{v.os}</td>
+                                <td className="p-2">{v.country || "—"}</td>
+                                <td className="p-2 text-xs text-muted-foreground whitespace-nowrap">{new Date(v.createdAt).toLocaleString()}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* ── Settings Tab ──────────────────────────────── */}
           <TabsContent value="settings">
             <Card>

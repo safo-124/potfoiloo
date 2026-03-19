@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer";
 import { PageTransition } from "@/components/page-transition";
 import { RouteProgress } from "@/components/route-progress";
 import { WhatsAppWidget } from "@/components/whatsapp-widget";
+import { PageViewTracker } from "@/components/page-view-tracker";
 import "./globals.css";
 
 const geistSans = Geist({
