@@ -8,6 +8,7 @@ interface Settings {
   title: string;
   tagline: string;
   about?: string | null;
+  avatarUrl?: string | null;
   email?: string | null;
   github?: string | null;
   linkedin?: string | null;
@@ -99,33 +100,47 @@ export function CVDocument({
 
           {/* ─── Header ─── */}
           <header className="border-b-2 border-gray-800 pb-4 mb-6">
-            <h1 className="text-3xl font-bold tracking-tight">{name}</h1>
-            <p className="text-lg text-gray-600 mt-1">{title}</p>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-gray-600">
-              {settings?.email && (
-                <span className="inline-flex items-center gap-1">
-                  <Mail className="h-3.5 w-3.5" />
-                  {settings.email}
-                </span>
-              )}
-              {settings?.github && (
-                <span className="inline-flex items-center gap-1">
-                  <Github className="h-3.5 w-3.5" />
-                  {settings.github.replace("https://github.com/", "")}
-                </span>
-              )}
-              {settings?.linkedin && (
-                <span className="inline-flex items-center gap-1">
-                  <Linkedin className="h-3.5 w-3.5" />
-                  {settings.linkedin.replace("https://www.linkedin.com/in/", "").replace("https://linkedin.com/in/", "")}
-                </span>
-              )}
-              {settings?.scholar && (
-                <span className="inline-flex items-center gap-1">
-                  <Globe className="h-3.5 w-3.5" />
-                  Google Scholar
-                </span>
-              )}
+            <div className="flex items-start gap-5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={settings?.avatarUrl || "/profile_pic.jpg"}
+                alt={name}
+                className="w-20 h-20 rounded-full object-cover shrink-0 border-2 border-gray-300 print:w-16 print:h-16"
+              />
+              <div className="min-w-0">
+                <h1 className="text-3xl font-bold tracking-tight">{name}</h1>
+                <p className="text-lg text-gray-600 mt-1">{title}</p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-gray-600">
+                  {settings?.email && (
+                    <a href={`mailto:${settings.email}`} className="inline-flex items-center gap-1 hover:text-gray-900 transition-colors">
+                      <Mail className="h-3.5 w-3.5" />
+                      {settings.email}
+                    </a>
+                  )}
+                  {settings?.github && (
+                    <a href={settings.github} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-gray-900 transition-colors">
+                      <Github className="h-3.5 w-3.5" />
+                      {settings.github.replace("https://github.com/", "")}
+                    </a>
+                  )}
+                  {settings?.linkedin && (
+                    <a href={settings.linkedin} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-gray-900 transition-colors">
+                      <Linkedin className="h-3.5 w-3.5" />
+                      {settings.linkedin.replace("https://www.linkedin.com/in/", "").replace("https://linkedin.com/in/", "")}
+                    </a>
+                  )}
+                  <a href="https://portfoilo-two-ivory.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-gray-900 transition-colors">
+                    <Globe className="h-3.5 w-3.5" />
+                    portfoilo-two-ivory.vercel.app
+                  </a>
+                  {settings?.scholar && (
+                    <a href={settings.scholar} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-gray-900 transition-colors">
+                      <Globe className="h-3.5 w-3.5" />
+                      Google Scholar
+                    </a>
+                  )}
+                </div>
+              </div>
             </div>
           </header>
 
