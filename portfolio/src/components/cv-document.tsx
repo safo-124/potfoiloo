@@ -3,7 +3,6 @@
 import { Mail, Github, Linkedin, Globe, ArrowLeft, Download } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
-import html2pdf from "html2pdf.js";
 
 interface Settings {
   name: string;
@@ -73,8 +72,9 @@ export function CVDocument({
   const title = settings?.title || "Signal Processing & ML Engineer";
   const cvRef = useRef<HTMLDivElement>(null);
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (cvRef.current) {
+      const html2pdf = (await import("html2pdf.js")).default;
       html2pdf()
         .set({
           margin: 0.5,
