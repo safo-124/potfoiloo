@@ -221,29 +221,44 @@ export function CVDocument({
           {/* ─── Skills ─── */}
           {Object.keys(skillsByCategory).length > 0 && (
             <section className="mb-6">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-1 mb-3">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-1 mb-4">
                 Technical Skills
               </h2>
-              <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-x-10 gap-y-3">
                 {Object.entries(skillsByCategory).map(([category, items]) => (
                   <div key={category}>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">{category}</h3>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
-                      {items.map((skill) => (
-                        <div key={skill.name} className="flex items-center gap-2">
-                          <span className="text-sm text-gray-800 w-36 shrink-0 truncate" title={skill.name}>{skill.name}</span>
-                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-gray-700 print:bg-gray-600"
-                              style={{ width: `${skill.level}%` }}
-                            />
-                          </div>
-                          <span className="text-[10px] text-gray-400 w-7 text-right shrink-0">{skill.level}%</span>
-                        </div>
-                      ))}
+                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1.5">{category}</h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {items.map((skill) => {
+                        const bg = skill.level >= 90
+                          ? "bg-gray-800 text-white"
+                          : skill.level >= 75
+                            ? "bg-gray-200 text-gray-800"
+                            : "bg-gray-100 text-gray-600";
+                        return (
+                          <span
+                            key={skill.name}
+                            className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${bg} print:border print:border-gray-300`}
+                            title={`${skill.level}%`}
+                          >
+                            {skill.name}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
+              </div>
+              <div className="flex items-center gap-4 mt-3 pt-2 border-t border-gray-200">
+                <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <span className="inline-block w-3 h-2 rounded-sm bg-gray-800" /> Expert (90%+)
+                </span>
+                <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <span className="inline-block w-3 h-2 rounded-sm bg-gray-200 border border-gray-300" /> Proficient (75-89%)
+                </span>
+                <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                  <span className="inline-block w-3 h-2 rounded-sm bg-gray-100 border border-gray-300" /> Familiar (&#60;75%)
+                </span>
               </div>
             </section>
           )}
