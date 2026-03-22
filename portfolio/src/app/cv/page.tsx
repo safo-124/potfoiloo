@@ -29,10 +29,10 @@ export default async function CVPage() {
   const education = experiences.filter((e) => e.type === "education");
   const work = experiences.filter((e) => e.type === "work" || e.type === "research");
 
-  const skillsByCategory: Record<string, string[]> = {};
+  const skillsByCategory: Record<string, { name: string; level: number }[]> = {};
   for (const s of skills) {
     if (!skillsByCategory[s.category]) skillsByCategory[s.category] = [];
-    skillsByCategory[s.category].push(s.name);
+    skillsByCategory[s.category].push({ name: s.name, level: s.level });
   }
 
   return (

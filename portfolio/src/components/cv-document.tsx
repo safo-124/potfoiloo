@@ -50,7 +50,7 @@ interface CVDocumentProps {
   settings: Settings | null;
   education: Experience[];
   work: Experience[];
-  skillsByCategory: Record<string, string[]>;
+  skillsByCategory: Record<string, { name: string; level: number }[]>;
   publications: Publication[];
   projects: Project[];
 }
@@ -224,11 +224,24 @@ export function CVDocument({
               <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-1 mb-3">
                 Technical Skills
               </h2>
-              <div className="space-y-2">
+              <div className="space-y-5">
                 {Object.entries(skillsByCategory).map(([category, items]) => (
-                  <div key={category} className="flex gap-2 text-sm">
-                    <span className="font-semibold text-gray-800 shrink-0">{category}:</span>
-                    <span className="text-gray-700">{items.join(", ")}</span>
+                  <div key={category}>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">{category}</h3>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
+                      {items.map((skill) => (
+                        <div key={skill.name} className="flex items-center gap-2">
+                          <span className="text-sm text-gray-800 w-36 shrink-0 truncate" title={skill.name}>{skill.name}</span>
+                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-gray-700 print:bg-gray-600"
+                              style={{ width: `${skill.level}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-gray-400 w-7 text-right shrink-0">{skill.level}%</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
