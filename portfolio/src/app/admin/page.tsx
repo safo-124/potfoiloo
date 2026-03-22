@@ -306,7 +306,10 @@ export default function AdminPage() {
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             <p className="text-muted-foreground">Manage your portfolio content</p>
           </div>
-          <Link href="/"><Button variant="outline">View Site</Button></Link>
+          <div className="flex items-center gap-2">
+            <Link href="/cv"><Button variant="outline">View CV</Button></Link>
+            <Link href="/"><Button variant="outline">View Site</Button></Link>
+          </div>
         </div>
 
         {/* Stats */}
