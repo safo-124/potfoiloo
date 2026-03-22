@@ -5,7 +5,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await request.json();
-    const publication = await prisma.publication.update({ where: { id }, data: body });
+    const { title, authors, venue, year, abstract: abs, doi, pdfUrl, type, order } = body;
+    const publication = await prisma.publication.update({ where: { id }, data: { title, authors, venue, year, abstract: abs, doi, pdfUrl, type, order } });
     return NextResponse.json(publication);
   } catch (error) {
     console.error("Failed to update publication:", error);

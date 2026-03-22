@@ -5,7 +5,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await request.json();
-    const skill = await prisma.skill.update({ where: { id }, data: body });
+    const { name, category, level, icon, order } = body;
+    const skill = await prisma.skill.update({ where: { id }, data: { name, category, level, icon, order } });
     return NextResponse.json(skill);
   } catch (error) {
     console.error("Failed to update skill:", error);

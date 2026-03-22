@@ -5,7 +5,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await request.json();
-    const project = await prisma.project.update({ where: { id }, data: body });
+    const { title, slug, description, longDescription, imageUrl, demoUrl, githubUrl, tags, category, featured, order } = body;
+    const project = await prisma.project.update({
+      where: { id },
+      data: { title, slug, description, longDescription, imageUrl, demoUrl, githubUrl, tags, category, featured, order },
+    });
     return NextResponse.json(project);
   } catch (error) {
     console.error("Failed to update project:", error);

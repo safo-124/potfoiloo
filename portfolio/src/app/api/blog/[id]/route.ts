@@ -5,7 +5,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await request.json();
-    const post = await prisma.blogPost.update({ where: { id }, data: body });
+    const { title, slug, excerpt, content, coverImage, tags, published } = body;
+    const post = await prisma.blogPost.update({ where: { id }, data: { title, slug, excerpt, content, coverImage, tags, published } });
     return NextResponse.json(post);
   } catch (error) {
     console.error("Failed to update blog post:", error);
