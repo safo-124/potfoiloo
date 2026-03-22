@@ -240,7 +240,7 @@ html {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  nav, footer, .print\\:hidden {
+  nav, footer, [data-print-hide] {
     display: none !important;
   }
   .cv-page {

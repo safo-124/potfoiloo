@@ -72,7 +72,7 @@ export function CVDocument({
   return (
     <div className="min-h-screen bg-background">
       {/* Toolbar — hidden when printing */}
-      <div className="print:hidden sticky top-0 z-40 bg-background/80 backdrop-blur border-b border-border">
+      <div data-print-hide className="print:hidden sticky top-0 z-40 bg-background/80 backdrop-blur border-b border-border">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between max-w-4xl">
           <Link
             href="/"
