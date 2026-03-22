@@ -2,6 +2,8 @@
 
 import { Mail, Github, Linkedin, Globe, ArrowLeft, Download } from "lucide-react";
 import Link from "next/link";
+import { useRef } from "react";
+import html2pdf from "html2pdf.js";
 
 interface Settings {
   name: string;
@@ -69,6 +71,21 @@ export function CVDocument({
 }: CVDocumentProps) {
   const name = settings?.name || "Emmanuel Safo Acheampong";
   const title = settings?.title || "Signal Processing & ML Engineer";
+  const cvRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPDF = () => {
+    if (cvRef.current) {
+      html2pdf()
+        .set({
+          margin: 0.5,
+          filename: "cv.pdf",
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+        })
+        .from(cvRef.current)
+        .save();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pt-24">
@@ -83,7 +100,7 @@ export function CVDocument({
             Back to portfolio
           </Link>
           <button
-            onClick={() => window.print()}
+            onClick={handleDownloadPDF}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition-colors cursor-pointer shadow-md"
           >
             <Download className="h-4 w-4" />
@@ -93,7 +110,7 @@ export function CVDocument({
       </div>
 
       {/* CV Content */}
-      <div className="container mx-auto px-4 pb-10 max-w-4xl print:px-0 print:py-0 print:max-w-none">
+      <div ref={cvRef} className="container mx-auto px-4 pb-10 max-w-4xl print:px-0 print:py-0 print:max-w-none">
         <div className="cv-page bg-white text-black rounded-lg shadow-sm border border-border print:rounded-none print:shadow-none print:border-none p-8 sm:p-12 print:p-[1cm]">
 
           {/* ─── Header ─── */}
