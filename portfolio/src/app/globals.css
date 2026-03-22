@@ -231,3 +231,27 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* ─── Print styles for CV page ─── */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  nav, footer, .print\\:hidden {
+    display: none !important;
+  }
+  .cv-page {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  @page {
+    size: A4;
+    margin: 1.5cm;
+  }
+}

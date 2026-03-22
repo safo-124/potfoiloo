@@ -203,10 +203,10 @@ export function HeroSection({ settings }: HeroProps) {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="text-sm sm:text-base" asChild>
-                <a href={settings?.resumeUrl || "/emmanuel-safo-cv.pdf"} target="_blank" rel="noopener noreferrer">
+                <Link href="/cv">
                   <Download className="mr-2 h-4 w-4" />
                   Download CV
-                </a>
+                </Link>
               </Button>
             </motion.div>
 
