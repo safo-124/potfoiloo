@@ -71,10 +71,10 @@ export function CVDocument({
   const title = settings?.title || "Signal Processing & ML Engineer";
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Toolbar — hidden when printing */}
-      <div data-print-hide className="print:hidden sticky top-0 z-40 bg-background/80 backdrop-blur border-b border-border">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between max-w-4xl">
+    <div className="min-h-screen bg-background pt-24">
+      {/* CV Actions Bar */}
+      <div data-print-hide className="print:hidden container mx-auto px-4 max-w-4xl mb-6">
+        <div className="flex items-center justify-between">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -82,20 +82,18 @@ export function CVDocument({
             <ArrowLeft className="h-4 w-4" />
             Back to portfolio
           </Link>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Download as PDF
-            </button>
-          </div>
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition-colors cursor-pointer shadow-md"
+          >
+            <Download className="h-4 w-4" />
+            Download as PDF
+          </button>
         </div>
       </div>
 
       {/* CV Content */}
-      <div className="container mx-auto px-4 py-10 max-w-4xl print:px-0 print:py-0 print:max-w-none">
+      <div className="container mx-auto px-4 pb-10 max-w-4xl print:px-0 print:py-0 print:max-w-none">
         <div className="cv-page bg-white text-black rounded-lg shadow-sm border border-border print:rounded-none print:shadow-none print:border-none p-8 sm:p-12 print:p-[1cm]">
 
           {/* ─── Header ─── */}
