@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { CVDocument } from "@/components/cv-document";
 
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "CV — Emmanuel Safo Acheampong",
