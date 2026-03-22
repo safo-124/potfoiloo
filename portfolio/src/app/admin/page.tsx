@@ -24,6 +24,9 @@ import {
   Smartphone,
   Tablet,
   Activity,
+  FileText,
+  ExternalLink,
+  Printer,
 } from "lucide-react";
 import {
   Card,
@@ -306,10 +309,7 @@ export default function AdminPage() {
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             <p className="text-muted-foreground">Manage your portfolio content</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/cv"><Button variant="outline">View CV</Button></Link>
-            <Link href="/"><Button variant="outline">View Site</Button></Link>
-          </div>
+          <Link href="/"><Button variant="outline">View Site</Button></Link>
         </div>
 
         {/* Stats */}
@@ -335,13 +335,16 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-9 mb-6">
+          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10 mb-6">
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="experiences">Experience</TabsTrigger>
             <TabsTrigger value="skills">Skills</TabsTrigger>
             <TabsTrigger value="publications">Publications</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
+            <TabsTrigger value="cv">
+              <FileText className="h-4 w-4 mr-1" /> CV
+            </TabsTrigger>
             <TabsTrigger value="analytics">
               <Activity className="h-4 w-4 mr-1" /> Analytics
             </TabsTrigger>
@@ -797,6 +800,53 @@ export default function AdminPage() {
                     {savingSettings ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Saving…</> : <><Check className="h-4 w-4 mr-2" />Save Settings</>}
                   </Button>
                 </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ── CV Tab ────────────────────────────────── */}
+          <TabsContent value="cv">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Curriculum Vitae</CardTitle>
+                  <CardDescription>Preview your CV — edit content via the other tabs (Experience, Skills, Publications, Projects, Settings)</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link href="/cv" target="_blank">
+                    <Button variant="outline" size="sm">
+                      <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Open Full Page
+                    </Button>
+                  </Link>
+                  <Button variant="outline" size="sm" onClick={() => {
+                    const iframe = document.getElementById("cv-preview") as HTMLIFrameElement;
+                    iframe?.contentWindow?.print();
+                  }}>
+                    <Printer className="h-3.5 w-3.5 mr-1.5" /> Download PDF
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg border border-border overflow-hidden bg-white">
+                  <iframe
+                    id="cv-preview"
+                    src="/cv"
+                    className="w-full border-0"
+                    style={{ height: "80vh" }}
+                    title="CV Preview"
+                  />
+                </div>
+                <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border">
+                  <h4 className="text-sm font-semibold mb-2">How to edit your CV</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-muted-foreground">
+                    <div><span className="font-medium text-foreground">Name, Title, Email, Links →</span> Settings tab</div>
+                    <div><span className="font-medium text-foreground">Work & Education →</span> Experience tab</div>
+                    <div><span className="font-medium text-foreground">Technical Skills →</span> Skills tab</div>
+                    <div><span className="font-medium text-foreground">Publications →</span> Publications tab</div>
+                    <div><span className="font-medium text-foreground">Featured Projects →</span> Projects tab</div>
+                    <div><span className="font-medium text-foreground">Professional Summary →</span> Settings tab (About)</div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
