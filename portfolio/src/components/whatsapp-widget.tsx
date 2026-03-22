@@ -57,7 +57,7 @@ export function WhatsAppWidget() {
   };
 
   return (
-    <>
+    <div data-print-hide>
       {/* Chat panel */}
       {open && (
         <div
@@ -137,6 +137,6 @@ export function WhatsAppWidget() {
           <WhatsAppIcon className="h-7 w-7 text-white" />
         )}
       </button>
-    </>
+    </div>
   );
 }

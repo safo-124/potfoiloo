@@ -250,6 +250,16 @@ html {
     padding: 0 !important;
     margin: 0 !important;
   }
+  /* Remove all top spacing so CV starts at page top */
+  .min-h-screen {
+    padding-top: 0 !important;
+    min-height: auto !important;
+  }
+  .container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
   @page {
     size: A4;
     margin: 1.5cm;
