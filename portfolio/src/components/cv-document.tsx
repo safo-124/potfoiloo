@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Github, Linkedin, Globe, Printer, ArrowLeft, Download } from "lucide-react";
+import { Mail, Github, Linkedin, Globe, ArrowLeft, Download } from "lucide-react";
 import Link from "next/link";
 
 interface Settings {
@@ -82,23 +82,12 @@ export function CVDocument({
             Back to portfolio
           </Link>
           <div className="flex items-center gap-2">
-            {settings?.resumeUrl && (
-              <a
-                href={settings.resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border border-border hover:bg-accent transition-colors"
-              >
-                <Download className="h-3.5 w-3.5" />
-                Download PDF
-              </a>
-            )}
             <button
               onClick={() => window.print()}
               className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
             >
-              <Printer className="h-3.5 w-3.5" />
-              Print / Save PDF
+              <Download className="h-3.5 w-3.5" />
+              Download as PDF
             </button>
           </div>
         </div>
