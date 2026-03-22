@@ -25,8 +25,8 @@ export default async function CVPage() {
     fetchJSON("/api/projects").then((d) => (d || []).filter((p: { featured: boolean }) => p.featured).slice(0, 5)),
   ]);
 
-  const education = experiences.filter((e) => e.type === "education");
-  const work = experiences.filter((e) => e.type === "work" || e.type === "research");
+  const education = experiences.filter((e: { type: string }) => e.type === "education");
+  const work = experiences.filter((e: { type: string }) => e.type === "work" || e.type === "research");
 
   const skillsByCategory: Record<string, { name: string; level: number }[]> = {};
   for (const s of skills) {
