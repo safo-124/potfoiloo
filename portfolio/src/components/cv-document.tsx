@@ -158,36 +158,6 @@ export function CVDocument({
             </section>
           )}
 
-          {/* ─── Work Experience ─── */}
-          {work.length > 0 && (
-            <section className="mb-6">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-1 mb-3">
-                Work Experience
-              </h2>
-              <div className="space-y-4">
-                {work.map((w) => (
-                  <div key={w.id}>
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="font-semibold text-sm">{w.title}</h3>
-                        <p className="text-sm text-gray-600">
-                          {w.company}
-                          {w.location ? ` — ${w.location}` : ""}
-                        </p>
-                      </div>
-                      <p className="text-xs text-gray-500 whitespace-nowrap shrink-0">
-                        {formatDate(w.startDate)} — {w.current ? "Present" : w.endDate ? formatDate(w.endDate) : ""}
-                      </p>
-                    </div>
-                    <p className="text-sm text-gray-700 mt-1 leading-relaxed">
-                      {w.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
           {/* ─── Education ─── */}
           {education.length > 0 && (
             <section className="mb-6">
@@ -211,6 +181,36 @@ export function CVDocument({
                     </div>
                     <p className="text-sm text-gray-700 mt-1 leading-relaxed">
                       {e.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ─── Work Experience ─── */}
+          {work.length > 0 && (
+            <section className="mb-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800 border-b border-gray-300 pb-1 mb-3">
+                Work Experience
+              </h2>
+              <div className="space-y-4">
+                {work.map((w) => (
+                  <div key={w.id}>
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h3 className="font-semibold text-sm">{w.title}</h3>
+                        <p className="text-sm text-gray-600">
+                          {w.company}
+                          {w.location ? ` — ${w.location}` : ""}
+                        </p>
+                      </div>
+                      <p className="text-xs text-gray-500 whitespace-nowrap shrink-0">
+                        {formatDate(w.startDate)} — {w.current ? "Present" : w.endDate ? formatDate(w.endDate) : ""}
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-700 mt-1 leading-relaxed">
+                      {w.description}
                     </p>
                   </div>
                 ))}
