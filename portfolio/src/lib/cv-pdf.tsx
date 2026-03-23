@@ -70,6 +70,16 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
   },
+  headerLinkItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 6,
+    marginBottom: 2,
+  },
+  headerLinkIcon: {
+    fontSize: 9,
+    marginRight: 3,
+  },
   headerLink: {
     fontSize: 9,
     color: "#1d4ed8",
@@ -184,16 +194,28 @@ function CvPdfDocument({
           <Text style={styles.headerTitle}>{settings.title}</Text>
           <View style={styles.headerLinksRow}>
             {emailLink && (
-              <Link src={emailLink} style={styles.headerLink}>{settings.email}</Link>
+              <View style={styles.headerLinkItem}>
+                <Text style={styles.headerLinkIcon}>@</Text>
+                <Link src={emailLink} style={styles.headerLink}>{settings.email}</Link>
+              </View>
             )}
             {settings.github && (
-              <Link src={settings.github} style={styles.headerLink}>{settings.github.replace("https://github.com/", "")}</Link>
+              <View style={styles.headerLinkItem}>
+                <Text style={styles.headerLinkIcon}>GH</Text>
+                <Link src={settings.github} style={styles.headerLink}>{settings.github.replace("https://github.com/", "")}</Link>
+              </View>
             )}
             {settings.linkedin && (
-              <Link src={settings.linkedin} style={styles.headerLink}>{settings.linkedin.replace("https://www.linkedin.com/in/", "").replace("https://linkedin.com/in/", "")}</Link>
+              <View style={styles.headerLinkItem}>
+                <Text style={styles.headerLinkIcon}>in</Text>
+                <Link src={settings.linkedin} style={styles.headerLink}>{settings.linkedin.replace("https://www.linkedin.com/in/", "").replace("https://linkedin.com/in/", "")}</Link>
+              </View>
             )}
             {settings.website && (
-              <Link src={settings.website} style={styles.headerLink}>{settings.website.replace(/^https?:\/\//, "")}</Link>
+              <View style={styles.headerLinkItem}>
+                <Text style={styles.headerLinkIcon}>www</Text>
+                <Link src={settings.website} style={styles.headerLink}>{settings.website.replace(/^https?:\/\//, "")}</Link>
+              </View>
             )}
           </View>
         </View>
