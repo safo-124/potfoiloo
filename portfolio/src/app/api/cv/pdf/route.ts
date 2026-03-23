@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { createCvPdfBuffer, CvSkillsByCategory } from "@/lib/cv-pdf";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
   try {
