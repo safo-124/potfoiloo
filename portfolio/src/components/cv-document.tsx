@@ -60,6 +60,49 @@ function formatDate(d: string | Date) {
   return new Date(d).toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
 
+type Html2PdfWorker = {
+  set: (options: unknown) => Html2PdfWorker;
+  from: (source: HTMLElement) => Html2PdfWorker;
+  save: () => Promise<void> | void;
+};
+
+type Html2PdfFactory = () => Html2PdfWorker;
+
+function resolveHtml2PdfFactory(moduleValue: unknown): Html2PdfFactory | null {
+  const direct = moduleValue as Html2PdfFactory;
+  if (typeof direct === "function") return direct;
+
+  const withDefault = moduleValue as { default?: unknown };
+  if (typeof withDefault?.default === "function") return withDefault.default as Html2PdfFactory;
+
+  const globalFactory = (window as Window & { html2pdf?: unknown }).html2pdf;
+  if (typeof globalFactory === "function") return globalFactory as Html2PdfFactory;
+
+  return null;
+}
+
+function prepareSourceForPdf(node: HTMLElement): HTMLElement {
+  const clone = node.cloneNode(true) as HTMLElement;
+  const fallbackAvatar = `${window.location.origin}/profile_pic.jpg`;
+
+  // External images can taint canvas and make pdf generation fail.
+  for (const img of Array.from(clone.querySelectorAll("img"))) {
+    const src = img.getAttribute("src") || "";
+    if (!src) continue;
+
+    try {
+      const parsed = new URL(src, window.location.origin);
+      if (parsed.origin !== window.location.origin) {
+        img.setAttribute("src", fallbackAvatar);
+      }
+    } catch {
+      img.setAttribute("src", fallbackAvatar);
+    }
+  }
+
+  return clone;
+}
+
 export function CVDocument({
   settings,
   education,
@@ -80,15 +123,12 @@ export function CVDocument({
     try {
       // Generate directly from the rendered CV so exported content matches current data.
       const html2pdfModule = await import("html2pdf.js");
-      const html2pdf = (html2pdfModule.default || html2pdfModule) as unknown as () => {
-        set: (options: unknown) => {
-          from: (source: HTMLElement) => { save: () => Promise<void> | void };
-        };
-      };
-
-      if (typeof html2pdf !== "function") {
+      const html2pdf = resolveHtml2PdfFactory(html2pdfModule.default || html2pdfModule);
+      if (!html2pdf) {
         throw new Error("PDF generator is unavailable");
       }
+
+      const sourceNode = prepareSourceForPdf(cvRef.current);
 
       await html2pdf()
         .set({
@@ -100,7 +140,7 @@ export function CVDocument({
           jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         })
-        .from(cvRef.current)
+        .from(sourceNode)
         .save();
     } catch (error) {
       console.error("Failed to generate CV PDF", error);
