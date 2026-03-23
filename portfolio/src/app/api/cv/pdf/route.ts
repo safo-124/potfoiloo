@@ -85,6 +85,14 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Failed to generate CV PDF:", error);
-    return NextResponse.json({ error: "Failed to generate CV PDF" }, { status: 500 });
+    const err = error as Error;
+    return NextResponse.json(
+      {
+        error: "Failed to generate CV PDF",
+        message: err.message,
+        stack: err.stack,
+      },
+      { status: 500 },
+    );
   }
 }
