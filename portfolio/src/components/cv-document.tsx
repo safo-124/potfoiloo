@@ -2,7 +2,7 @@
 
 import { Mail, Github, Linkedin, Globe, ArrowLeft, Download } from "lucide-react";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 interface Settings {
   name: string;
@@ -71,19 +71,43 @@ export function CVDocument({
   const name = settings?.name || "Emmanuel Safo Acheampong";
   const title = settings?.title || "Signal Processing & ML Engineer";
   const cvRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const resumeDownloadUrl = settings?.resumeUrl || "/emmanuel-safo-cv.pdf";
 
   const handleDownloadPDF = async () => {
-    if (cvRef.current) {
-      const html2pdf = (await import("html2pdf.js")).default;
-      html2pdf()
-        .set({
-          margin: 0.5,
-          filename: "cv.pdf",
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-        })
-        .from(cvRef.current)
-        .save();
+    setIsDownloading(true);
+    try {
+      // Prefer the hosted CV file for consistent production downloads.
+      const link = document.createElement("a");
+      link.href = resumeDownloadUrl;
+      link.download = "emmanuel-safo-cv.pdf";
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch {
+      // Fall back to generating a PDF from the rendered page.
+      if (cvRef.current) {
+        const html2pdfModule = await import("html2pdf.js");
+        const html2pdf = (html2pdfModule.default || html2pdfModule) as unknown as () => {
+          set: (options: unknown) => {
+            from: (source: HTMLElement) => { save: () => Promise<void> | void };
+          };
+        };
+
+        await html2pdf()
+          .set({
+            margin: 0.5,
+            filename: "cv.pdf",
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+          })
+          .from(cvRef.current)
+          .save();
+      }
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -101,10 +125,11 @@ export function CVDocument({
           </Link>
           <button
             onClick={handleDownloadPDF}
+            disabled={isDownloading}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 text-white font-medium text-sm hover:bg-emerald-700 transition-colors cursor-pointer shadow-md"
           >
             <Download className="h-4 w-4" />
-            Download as PDF
+            {isDownloading ? "Downloading..." : "Download as PDF"}
           </button>
         </div>
       </div>
