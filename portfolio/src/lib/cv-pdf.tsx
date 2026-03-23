@@ -203,25 +203,25 @@ function CvPdfDocument({
           <View style={styles.headerLinksRow}>
             {emailLink && (
               <View style={styles.headerLinkItem}>
-                <Image src={mailIcon} style={styles.headerIconImage} alt="" />
+                <Image src={mailIcon} style={styles.headerIconImage} />
                 <Link src={emailLink} style={styles.headerLink}>{settings.email}</Link>
               </View>
             )}
             {settings.github && (
               <View style={styles.headerLinkItem}>
-                <Image src={githubIcon} style={styles.headerIconImage} alt="" />
+                <Image src={githubIcon} style={styles.headerIconImage} />
                 <Link src={settings.github} style={styles.headerLink}>{settings.github.replace("https://github.com/", "")}</Link>
               </View>
             )}
             {settings.linkedin && (
               <View style={styles.headerLinkItem}>
-                <Image src={linkedinIcon} style={styles.headerIconImage} alt="" />
+                <Image src={linkedinIcon} style={styles.headerIconImage} />
                 <Link src={settings.linkedin} style={styles.headerLink}>{settings.linkedin.replace("https://www.linkedin.com/in/", "").replace("https://linkedin.com/in/", "")}</Link>
               </View>
             )}
             {settings.website && (
               <View style={styles.headerLinkItem}>
-                <Image src={websiteIcon} style={styles.headerIconImage} alt="" />
+                <Image src={websiteIcon} style={styles.headerIconImage} />
                 <Link src={settings.website} style={styles.headerLink}>{settings.website.replace(/^https?:\/\//, "")}</Link>
               </View>
             )}
