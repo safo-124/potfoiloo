@@ -1,4 +1,4 @@
-import { pdf, Document, Page, Text, View, Link, StyleSheet } from "@react-pdf/renderer";
+import { pdf, Document, Page, Text, View, Link, StyleSheet, Image } from "@react-pdf/renderer";
 
 // Data types shared with the API route
 export interface CvSettings {
@@ -48,6 +48,9 @@ export interface CvPdfData {
   projects: CvProject[];
 }
 
+const SITE_BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoilo-two-ivory.vercel.app";
+const ICON_BASE_URL = `${SITE_BASE_URL}/pdf-icons`;
+
 const styles = StyleSheet.create({
   page: {
     paddingTop: 40,
@@ -76,8 +79,9 @@ const styles = StyleSheet.create({
     marginRight: 6,
     marginBottom: 2,
   },
-  headerLinkIcon: {
-    fontSize: 9,
+  headerIconImage: {
+    width: 9,
+    height: 9,
     marginRight: 3,
   },
   headerLink: {
@@ -184,6 +188,10 @@ function CvPdfDocument({
   projects,
 }: CvPdfData) {
   const emailLink = settings.email ? `mailto:${settings.email}` : undefined;
+  const mailIcon = `${ICON_BASE_URL}/mail.png`;
+  const githubIcon = `${ICON_BASE_URL}/github.png`;
+  const linkedinIcon = `${ICON_BASE_URL}/linkedin.png`;
+  const websiteIcon = `${ICON_BASE_URL}/website.png`;
 
   return (
     <Document>
@@ -195,25 +203,25 @@ function CvPdfDocument({
           <View style={styles.headerLinksRow}>
             {emailLink && (
               <View style={styles.headerLinkItem}>
-                <Text style={styles.headerLinkIcon}>@</Text>
+                <Image src={mailIcon} style={styles.headerIconImage} alt="" />
                 <Link src={emailLink} style={styles.headerLink}>{settings.email}</Link>
               </View>
             )}
             {settings.github && (
               <View style={styles.headerLinkItem}>
-                <Text style={styles.headerLinkIcon}>GH</Text>
+                <Image src={githubIcon} style={styles.headerIconImage} alt="" />
                 <Link src={settings.github} style={styles.headerLink}>{settings.github.replace("https://github.com/", "")}</Link>
               </View>
             )}
             {settings.linkedin && (
               <View style={styles.headerLinkItem}>
-                <Text style={styles.headerLinkIcon}>in</Text>
+                <Image src={linkedinIcon} style={styles.headerIconImage} alt="" />
                 <Link src={settings.linkedin} style={styles.headerLink}>{settings.linkedin.replace("https://www.linkedin.com/in/", "").replace("https://linkedin.com/in/", "")}</Link>
               </View>
             )}
             {settings.website && (
               <View style={styles.headerLinkItem}>
-                <Text style={styles.headerLinkIcon}>www</Text>
+                <Image src={websiteIcon} style={styles.headerIconImage} alt="" />
                 <Link src={settings.website} style={styles.headerLink}>{settings.website.replace(/^https?:\/\//, "")}</Link>
               </View>
             )}
