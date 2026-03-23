@@ -79,7 +79,7 @@ export function CVDocument({
     // the final CV with proper clickable links.
     try {
       setIsDownloading(true);
-      const href = settings?.resumeUrl || "/emmanuel-safo-cv.pdf";
+      const href = "/emmanuel-safo-cv.pdf";
       const link = document.createElement("a");
       link.href = href;
       link.download = "emmanuel-safo-cv.pdf";
