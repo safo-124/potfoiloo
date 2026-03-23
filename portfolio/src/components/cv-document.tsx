@@ -73,39 +73,32 @@ export function CVDocument({
   const cvRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const resumeDownloadUrl = settings?.resumeUrl || "/emmanuel-safo-cv.pdf";
-
   const handleDownloadPDF = async () => {
+    if (!cvRef.current) return;
+
     setIsDownloading(true);
     try {
-      // Prefer the hosted CV file for consistent production downloads.
-      const link = document.createElement("a");
-      link.href = resumeDownloadUrl;
-      link.download = "emmanuel-safo-cv.pdf";
-      link.rel = "noopener noreferrer";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch {
-      // Fall back to generating a PDF from the rendered page.
-      if (cvRef.current) {
-        const html2pdfModule = await import("html2pdf.js");
-        const html2pdf = (html2pdfModule.default || html2pdfModule) as unknown as () => {
-          set: (options: unknown) => {
-            from: (source: HTMLElement) => { save: () => Promise<void> | void };
-          };
+      // Generate directly from the rendered CV so exported content matches current data.
+      const html2pdfModule = await import("html2pdf.js");
+      const html2pdf = (html2pdfModule.default || html2pdfModule) as unknown as () => {
+        set: (options: unknown) => {
+          from: (source: HTMLElement) => { save: () => Promise<void> | void };
         };
+      };
 
-        await html2pdf()
-          .set({
-            margin: 0.5,
-            filename: "cv.pdf",
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-          })
-          .from(cvRef.current)
-          .save();
-      }
+      await html2pdf()
+        .set({
+          margin: 0.5,
+          filename: "emmanuel-safo-cv.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+        })
+        .from(cvRef.current)
+        .save();
+    } catch {
+      window.print();
     } finally {
       setIsDownloading(false);
     }
