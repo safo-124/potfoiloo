@@ -62,13 +62,19 @@ async function fetchJSON<T>(path: string): Promise<T> {
 
 export async function GET() {
   try {
-    const [settings, experiences, skills, publications, projects] = await Promise.all([
+    const [settings, experiences, skills, publications] = await Promise.all([
       fetchJSON<ApiSettings>("/api/settings"),
       fetchJSON<ApiExperience[]>("/api/experiences"),
       fetchJSON<ApiSkill[]>("/api/skills"),
       fetchJSON<ApiPublication[]>("/api/publications"),
-      fetchJSON<ApiProject[]>("/api/projects"),
     ]);
+
+    let projects: ApiProject[] = [];
+    try {
+      projects = await fetchJSON<ApiProject[]>("/api/projects");
+    } catch (err) {
+      console.error("Failed to fetch projects for CV PDF (continuing without projects):", err);
+    }
 
     if (!settings) {
       return NextResponse.json({ error: "Site settings not found" }, { status: 500 });
