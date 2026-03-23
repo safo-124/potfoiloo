@@ -74,22 +74,25 @@ export function CVDocument({
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownloadPDF = async () => {
-    // For reliability in production, download the curated static PDF.
-    // This file lives in public/emmanuel-safo-cv.pdf and should contain
-    // the final CV with proper clickable links.
     try {
       setIsDownloading(true);
-      const href = "/emmanuel-safo-cv.pdf";
+      const res = await fetch("/api/cv/pdf", { method: "GET" });
+      if (!res.ok) {
+        throw new Error("Failed to generate PDF");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = href;
+      link.href = url;
       link.download = "emmanuel-safo-cv.pdf";
       link.rel = "noopener noreferrer";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Failed to start CV download", error);
-      alert("Unable to start the download. Please try again.");
+      console.error("Failed to download CV PDF", error);
+      alert("Unable to generate the PDF right now. Please try again.");
     } finally {
       setIsDownloading(false);
     }

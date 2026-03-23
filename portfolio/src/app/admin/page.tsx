@@ -818,10 +818,29 @@ export default function AdminPage() {
                       <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Open Full Page
                     </Button>
                   </Link>
-                  <Button variant="outline" size="sm" onClick={() => {
-                    const iframe = document.getElementById("cv-preview") as HTMLIFrameElement;
-                    iframe?.contentWindow?.print();
-                  }}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch("/api/cv/pdf");
+                        if (!res.ok) throw new Error("Failed to generate CV PDF");
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = "emmanuel-safo-cv.pdf";
+                        link.rel = "noopener noreferrer";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                      } catch (error) {
+                        console.error("Failed to download CV PDF", error);
+                        alert("Unable to generate the PDF right now. Please try again.");
+                      }
+                    }}
+                  >
                     <Printer className="h-3.5 w-3.5 mr-1.5" /> Download PDF
                   </Button>
                 </div>
