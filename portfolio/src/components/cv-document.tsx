@@ -86,10 +86,15 @@ export function CVDocument({
         };
       };
 
+      if (typeof html2pdf !== "function") {
+        throw new Error("PDF generator is unavailable");
+      }
+
       await html2pdf()
         .set({
           margin: 0.5,
           filename: "emmanuel-safo-cv.pdf",
+          enableLinks: true,
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true, logging: false },
           jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
@@ -97,8 +102,9 @@ export function CVDocument({
         })
         .from(cvRef.current)
         .save();
-    } catch {
-      window.print();
+    } catch (error) {
+      console.error("Failed to generate CV PDF", error);
+      alert("Unable to generate the PDF right now. Please refresh the page and try again.");
     } finally {
       setIsDownloading(false);
     }
