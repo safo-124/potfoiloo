@@ -1,18 +1,73 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { createCvPdfBuffer, CvSkillsByCategory } from "@/lib/cv-pdf";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+interface ApiSettings {
+  name: string;
+  title: string;
+  tagline?: string | null;
+  about?: string | null;
+  avatarUrl?: string | null;
+  email?: string | null;
+  github?: string | null;
+  linkedin?: string | null;
+  scholar?: string | null;
+}
+
+interface ApiExperience {
+  id: string;
+  title: string;
+  company: string;
+  location?: string | null;
+  description: string;
+  startDate: string;
+  endDate?: string | null;
+  current: boolean;
+  type: string;
+}
+
+interface ApiSkill {
+  id: string;
+  name: string;
+  category: string;
+  level: number;
+}
+
+interface ApiPublication {
+  id: string;
+  title: string;
+  authors: string;
+  venue: string;
+  year: number;
+}
+
+interface ApiProject {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  featured: boolean;
+}
+
+async function fetchJSON<T>(path: string): Promise<T> {
+  const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
+  const res = await fetch(`${base}${path}`, { cache: "no-store" });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${path}: ${res.status}`);
+  }
+  return res.json() as Promise<T>;
+}
+
 export async function GET() {
   try {
     const [settings, experiences, skills, publications, projects] = await Promise.all([
-      prisma.siteSettings.findUnique({ where: { id: "main" } }),
-      prisma.experience.findMany({ orderBy: [{ order: "asc" }, { startDate: "desc" }] }),
-      prisma.skill.findMany({ orderBy: [{ category: "asc" }, { order: "asc" }] }),
-      prisma.publication.findMany({ orderBy: [{ order: "asc" }, { year: "desc" }] }),
-      prisma.project.findMany({ orderBy: [{ order: "asc" }, { createdAt: "desc" }] }),
+      fetchJSON<ApiSettings>("/api/settings"),
+      fetchJSON<ApiExperience[]>("/api/experiences"),
+      fetchJSON<ApiSkill[]>("/api/skills"),
+      fetchJSON<ApiPublication[]>("/api/publications"),
+      fetchJSON<ApiProject[]>("/api/projects"),
     ]);
 
     if (!settings) {
@@ -51,8 +106,8 @@ export async function GET() {
         company: e.company,
         location: e.location,
         description: e.description,
-        startDate: e.startDate instanceof Date ? e.startDate.toISOString() : String(e.startDate),
-        endDate: e.endDate instanceof Date || e.endDate === null ? e.endDate?.toISOString() ?? null : String(e.endDate),
+        startDate: String(e.startDate),
+        endDate: e.endDate ? String(e.endDate) : null,
         current: e.current,
       })),
       work: work.map((w) => ({
@@ -61,8 +116,8 @@ export async function GET() {
         company: w.company,
         location: w.location,
         description: w.description,
-        startDate: w.startDate instanceof Date ? w.startDate.toISOString() : String(w.startDate),
-        endDate: w.endDate instanceof Date || w.endDate === null ? w.endDate?.toISOString() ?? null : String(w.endDate),
+        startDate: String(w.startDate),
+        endDate: w.endDate ? String(w.endDate) : null,
         current: w.current,
       })),
       skillsByCategory,
