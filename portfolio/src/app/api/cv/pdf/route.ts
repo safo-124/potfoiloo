@@ -51,8 +51,7 @@ interface ApiProject {
   featured: boolean;
 }
 
-async function fetchJSON<T>(path: string): Promise<T> {
-  const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
+async function fetchJSON<T>(base: string, path: string): Promise<T> {
   const res = await fetch(`${base}${path}`, { cache: "no-store" });
   if (!res.ok) {
     throw new Error(`Failed to fetch ${path}: ${res.status}`);
@@ -60,18 +59,19 @@ async function fetchJSON<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const origin = new URL(request.url).origin;
     const [settings, experiences, skills, publications] = await Promise.all([
-      fetchJSON<ApiSettings>("/api/settings"),
-      fetchJSON<ApiExperience[]>("/api/experiences"),
-      fetchJSON<ApiSkill[]>("/api/skills"),
-      fetchJSON<ApiPublication[]>("/api/publications"),
+      fetchJSON<ApiSettings>(origin, "/api/settings"),
+      fetchJSON<ApiExperience[]>(origin, "/api/experiences"),
+      fetchJSON<ApiSkill[]>(origin, "/api/skills"),
+      fetchJSON<ApiPublication[]>(origin, "/api/publications"),
     ]);
 
     let projects: ApiProject[] = [];
     try {
-      projects = await fetchJSON<ApiProject[]>("/api/projects");
+      projects = await fetchJSON<ApiProject[]>(origin, "/api/projects");
     } catch (err) {
       console.error("Failed to fetch projects for CV PDF (continuing without projects):", err);
     }
