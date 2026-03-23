@@ -80,8 +80,8 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   headerIconImage: {
-    width: 9,
-    height: 9,
+    width: 12,
+    height: 12,
     marginRight: 3,
   },
   headerLink: {
