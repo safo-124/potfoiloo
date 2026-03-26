@@ -1,8 +1,34 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createCvPdfBuffer, CvSkillsByCategory } from "@/lib/cv-pdf";
+import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+function parseDevice(ua: string): string {
+  if (/mobile|android|iphone|ipod/i.test(ua)) return "mobile";
+  if (/ipad|tablet/i.test(ua)) return "tablet";
+  return "desktop";
+}
+
+function parseBrowser(ua: string): string {
+  if (/edg\//i.test(ua)) return "Edge";
+  if (/chrome|crios/i.test(ua)) return "Chrome";
+  if (/firefox|fxios/i.test(ua)) return "Firefox";
+  if (/safari/i.test(ua) && !/chrome/i.test(ua)) return "Safari";
+  if (/opera|opr/i.test(ua)) return "Opera";
+  return "Other";
+}
+
+function parseOS(ua: string): string {
+  if (/windows/i.test(ua)) return "Windows";
+  if (/mac os|macintosh/i.test(ua)) return "macOS";
+  if (/linux/i.test(ua) && !/android/i.test(ua)) return "Linux";
+  if (/android/i.test(ua)) return "Android";
+  if (/iphone|ipad|ipod/i.test(ua)) return "iOS";
+  return "Other";
+}
 
 interface ApiSettings {
   name: string;
@@ -59,8 +85,23 @@ async function fetchJSON<T>(base: string, path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    // Track the download
+    const ua = request.headers.get("user-agent") || "";
+    const country = request.headers.get("x-vercel-ip-country") || null;
+    const referrer = request.headers.get("referer")?.slice(0, 1000) || null;
+    prisma.cvDownload.create({
+      data: {
+        userAgent: ua.slice(0, 500),
+        device: parseDevice(ua),
+        browser: parseBrowser(ua),
+        os: parseOS(ua),
+        country,
+        referrer,
+      },
+    }).catch((err: unknown) => logger.error("cv", "Failed to track CV download", err));
+
     const origin = new URL(request.url).origin;
     const [settings, experiences, skills, publications] = await Promise.all([
       fetchJSON<ApiSettings>(origin, "/api/settings"),
@@ -146,7 +187,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Failed to generate CV PDF:", error);
+    logger.error("cv", "Failed to generate CV PDF", error);
     const err = error as Error;
     return NextResponse.json(
       {

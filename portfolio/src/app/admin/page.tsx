@@ -80,6 +80,8 @@ interface AnalyticsData {
   oses: { os: string; count: number }[];
   countries: { country: string; count: number }[];
   recentViews: { id: string; path: string; device: string; browser: string; os: string; country: string; referrer: string | null; createdAt: string }[];
+  cvDownloads: number;
+  recentCvDownloads: { id: string; device: string; browser: string; os: string; country: string; referrer: string | null; createdAt: string }[];
 }
 interface SiteSettings {
   id: string; name: string; title: string; tagline: string; about?: string;
@@ -621,10 +623,16 @@ export default function AdminPage() {
                   <p className="text-muted-foreground text-center py-12">No page views recorded yet. Visit your site to start tracking!</p>
                 ) : (
                   <div className="space-y-8">
-                    {/* Total Views */}
-                    <div className="text-center p-6 rounded-xl border border-border bg-primary/5">
-                      <p className="text-4xl font-bold text-primary">{analytics.totalViews.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground mt-1">Total page views (last {analyticsDays} days)</p>
+                    {/* Total Views + CV Downloads */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="text-center p-6 rounded-xl border border-border bg-primary/5">
+                        <p className="text-4xl font-bold text-primary">{analytics.totalViews.toLocaleString()}</p>
+                        <p className="text-sm text-muted-foreground mt-1">Total page views (last {analyticsDays} days)</p>
+                      </div>
+                      <div className="text-center p-6 rounded-xl border border-border bg-emerald-500/10">
+                        <p className="text-4xl font-bold text-emerald-500">{(analytics.cvDownloads ?? 0).toLocaleString()}</p>
+                        <p className="text-sm text-muted-foreground mt-1">CV Downloads (last {analyticsDays} days)</p>
+                      </div>
                     </div>
 
                     {/* Views per day chart */}
@@ -713,6 +721,37 @@ export default function AdminPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Recent CV Downloads */}
+                    {analytics.recentCvDownloads && analytics.recentCvDownloads.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><FileText className="h-4 w-4" />Recent CV Downloads</h3>
+                        <div className="overflow-x-auto rounded-lg border border-border">
+                          <table className="w-full text-sm">
+                            <thead className="bg-muted/50">
+                              <tr>
+                                <th className="text-left p-2 font-medium">Device</th>
+                                <th className="text-left p-2 font-medium">Browser</th>
+                                <th className="text-left p-2 font-medium">OS</th>
+                                <th className="text-left p-2 font-medium">Country</th>
+                                <th className="text-left p-2 font-medium">Time</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {analytics.recentCvDownloads.map((d) => (
+                                <tr key={d.id} className="border-t border-border">
+                                  <td className="p-2 capitalize">{d.device}</td>
+                                  <td className="p-2">{d.browser}</td>
+                                  <td className="p-2">{d.os}</td>
+                                  <td className="p-2">{d.country || "—"}</td>
+                                  <td className="p-2 text-xs text-muted-foreground whitespace-nowrap">{new Date(d.createdAt).toLocaleString()}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Recent Visits Table */}
                     <div>

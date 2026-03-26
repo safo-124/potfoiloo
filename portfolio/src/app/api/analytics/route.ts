@@ -108,6 +108,17 @@ export async function GET(request: NextRequest) {
       select: { id: true, path: true, device: true, browser: true, os: true, country: true, referrer: true, createdAt: true },
     });
 
+    // CV Downloads
+    const [cvDownloadCount, cvDownloads] = await Promise.all([
+      prisma.cvDownload.count({ where: { createdAt: { gte: since } } }),
+      prisma.cvDownload.findMany({
+        where: { createdAt: { gte: since } },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: { id: true, device: true, browser: true, os: true, country: true, referrer: true, createdAt: true },
+      }),
+    ]);
+
     // Convert BigInt to Number for JSON serialization
     const toNum = (rows: { count: bigint }[]) => rows.map(r => ({ ...r, count: Number(r.count) }));
 
@@ -120,6 +131,8 @@ export async function GET(request: NextRequest) {
       oses: toNum(oses),
       countries: toNum(countries),
       recentViews,
+      cvDownloads: cvDownloadCount,
+      recentCvDownloads: cvDownloads,
     });
   } catch (error) {
     logger.error("analytics", "Failed to fetch analytics", error);

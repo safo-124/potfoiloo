@@ -129,3 +129,16 @@ model PageView {
   @@index([createdAt])
   @@index([path])
 }
+
+model CvDownload {
+  id        String   @id @default(cuid())
+  userAgent String?
+  device    String?  // "desktop" | "mobile" | "tablet"
+  browser   String?
+  os        String?
+  country   String?
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
