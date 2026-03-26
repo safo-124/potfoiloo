@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
 
     // CV Downloads (non-fatal — don't break analytics if table is missing)
     let cvDownloadCount = 0;
-    let cvDownloads: { id: string; device: string; browser: string; os: string; country: string; referrer: string | null; createdAt: Date }[] = [];
+    let cvDownloads: { id: string; device: string | null; browser: string | null; os: string | null; country: string | null; referrer: string | null; createdAt: Date }[] = [];
     try {
       [cvDownloadCount, cvDownloads] = await Promise.all([
         prisma.cvDownload.count({ where: { createdAt: { gte: since } } }),
