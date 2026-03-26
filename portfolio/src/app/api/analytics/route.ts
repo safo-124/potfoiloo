@@ -108,16 +108,22 @@ export async function GET(request: NextRequest) {
       select: { id: true, path: true, device: true, browser: true, os: true, country: true, referrer: true, createdAt: true },
     });
 
-    // CV Downloads
-    const [cvDownloadCount, cvDownloads] = await Promise.all([
-      prisma.cvDownload.count({ where: { createdAt: { gte: since } } }),
-      prisma.cvDownload.findMany({
-        where: { createdAt: { gte: since } },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-        select: { id: true, device: true, browser: true, os: true, country: true, referrer: true, createdAt: true },
-      }),
-    ]);
+    // CV Downloads (non-fatal — don't break analytics if table is missing)
+    let cvDownloadCount = 0;
+    let cvDownloads: { id: string; device: string; browser: string; os: string; country: string; referrer: string | null; createdAt: Date }[] = [];
+    try {
+      [cvDownloadCount, cvDownloads] = await Promise.all([
+        prisma.cvDownload.count({ where: { createdAt: { gte: since } } }),
+        prisma.cvDownload.findMany({
+          where: { createdAt: { gte: since } },
+          orderBy: { createdAt: "desc" },
+          take: 20,
+          select: { id: true, device: true, browser: true, os: true, country: true, referrer: true, createdAt: true },
+        }),
+      ]);
+    } catch (e) {
+      logger.error("analytics", "Failed to fetch CV downloads", e);
+    }
 
     // Convert BigInt to Number for JSON serialization
     const toNum = (rows: { count: bigint }[]) => rows.map(r => ({ ...r, count: Number(r.count) }));
