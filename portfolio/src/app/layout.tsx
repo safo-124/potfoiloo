@@ -80,6 +80,7 @@ export default function RootLayout({
           </main>
           <Footer />
           <WhatsAppWidget />
+          <PageViewTracker />
         </ThemeProvider>
       </body>
     </html>

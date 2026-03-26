@@ -215,6 +215,15 @@ export default function AdminPage() {
     setAnalyticsLoading(false);
   }, []);
 
+  // Auto-refresh analytics every 30 seconds
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const interval = setInterval(() => {
+      fetchAnalytics(analyticsDays);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, analyticsDays, fetchAnalytics]);
+
   useEffect(() => {
     if (isAuthenticated) { fetchAll(); fetchAnalytics(analyticsDays); }
   }, [isAuthenticated, fetchAll, fetchAnalytics, analyticsDays]);
@@ -644,7 +653,7 @@ export default function AdminPage() {
                             const max = Math.max(...analytics.viewsPerDay.map(v => v.count), 1);
                             const pct = (d.count / max) * 100;
                             return (
-                              <div key={d.date} className="flex-1 flex flex-col items-center gap-1" title={`${d.date}: ${d.count} views`}>
+                              <div key={d.date} className="flex-1 flex flex-col items-center gap-1" title={`${new Date(d.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}: ${d.count} views`}>
                                 <span className="text-[10px] text-muted-foreground">{d.count}</span>
                                 <div className="w-full bg-primary/80 rounded-t" style={{ height: `${Math.max(pct, 4)}%` }} />
                               </div>
@@ -652,8 +661,8 @@ export default function AdminPage() {
                           })}
                         </div>
                         <div className="flex justify-between mt-1">
-                          <span className="text-[10px] text-muted-foreground">{analytics.viewsPerDay[0]?.date}</span>
-                          <span className="text-[10px] text-muted-foreground">{analytics.viewsPerDay[analytics.viewsPerDay.length - 1]?.date}</span>
+                          <span className="text-[10px] text-muted-foreground">{new Date(analytics.viewsPerDay[0]?.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                          <span className="text-[10px] text-muted-foreground">{new Date(analytics.viewsPerDay[analytics.viewsPerDay.length - 1]?.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
                         </div>
                       </div>
                     )}
