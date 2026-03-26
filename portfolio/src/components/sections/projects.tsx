@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Github, ExternalLink, Filter } from "lucide-react";
+import { BrowserFrame } from "@/components/ui/browser-frame";
 
 /* ─── 3D Tilt Card Wrapper ─── */
 function TiltCard({ children, className, featured }: { children: React.ReactNode; className?: string; featured?: boolean }) {
@@ -51,63 +52,6 @@ function TiltCard({ children, className, featured }: { children: React.ReactNode
           transition: "opacity 0.2s",
         }}
       />
-    </div>
-  );
-}
-
-
-
-/* ─── Browser Frame Preview ─── */
-function BrowserFrame({ url, title }: { url: string; title: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.3);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const measure = () => setScale(el.offsetWidth / 1280);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  return (
-    <div className="relative w-full overflow-hidden bg-muted/30">
-      {/* Browser toolbar */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-muted/60 border-b border-border">
-        <div className="flex gap-1.5">
-          <div className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
-          <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/70" />
-          <div className="h-2.5 w-2.5 rounded-full bg-green-400/70" />
-        </div>
-        <div className="flex-1 mx-2">
-          <div className="bg-background/60 rounded-md px-3 py-0.5 text-[10px] text-muted-foreground truncate font-mono">
-            {url.replace(/^https?:\/\//, "")}
-          </div>
-        </div>
-      </div>
-      {/* Iframe viewport — scales to fill container width */}
-      <div
-        ref={containerRef}
-        className="relative w-full overflow-hidden"
-        style={{ height: `${800 * scale}px` }}
-      >
-        <iframe
-          src={url}
-          title={`Preview of ${title}`}
-          className="absolute top-0 left-0 border-0 pointer-events-none"
-          style={{
-            width: "1280px",
-            height: "800px",
-            transform: `scale(${scale})`,
-            transformOrigin: "top left",
-          }}
-          loading="lazy"
-          sandbox="allow-scripts allow-same-origin"
-          tabIndex={-1}
-        />
-      </div>
     </div>
   );
 }

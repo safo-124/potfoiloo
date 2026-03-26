@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -8,12 +10,15 @@ export async function GET() {
     });
     return NextResponse.json(posts);
   } catch (error) {
-    console.error("Failed to fetch blog posts:", error);
+    logger.error("blog", "Failed to fetch blog posts", error);
     return NextResponse.json({ error: "Failed to fetch blog posts" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { title, slug, excerpt, content, coverImage, tags, published } = body;
@@ -27,7 +32,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(post, { status: 201 });
   } catch (error) {
-    console.error("Failed to create blog post:", error);
+    logger.error("blog", "Failed to create blog post", error);
     return NextResponse.json({ error: "Failed to create blog post" }, { status: 500 });
   }
 }

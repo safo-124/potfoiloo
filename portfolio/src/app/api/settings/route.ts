@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -9,12 +11,15 @@ export async function GET() {
     }
     return NextResponse.json(settings);
   } catch (error) {
-    console.error("Failed to fetch settings:", error);
+    logger.error("settings", "Failed to fetch settings", error);
     return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 });
   }
 }
 
 export async function PUT(request: Request) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { name, title, tagline, about, avatarUrl, resumeUrl, email, github, linkedin, scholar, twitter } = body;
@@ -27,7 +32,7 @@ export async function PUT(request: Request) {
 
     return NextResponse.json(settings);
   } catch (error) {
-    console.error("Failed to update settings:", error);
+    logger.error("settings", "Failed to update settings", error);
     return NextResponse.json({ error: "Failed to update settings" }, { status: 500 });
   }
 }

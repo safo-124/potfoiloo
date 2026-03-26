@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -16,18 +21,21 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     });
     return NextResponse.json(experience);
   } catch (error) {
-    console.error("Failed to update experience:", error);
+    logger.error("experiences", "Failed to update experience", error);
     return NextResponse.json({ error: "Failed to update experience" }, { status: 500 });
   }
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     await prisma.experience.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete experience:", error);
+    logger.error("experiences", "Failed to delete experience", error);
     return NextResponse.json({ error: "Failed to delete experience" }, { status: 500 });
   }
 }

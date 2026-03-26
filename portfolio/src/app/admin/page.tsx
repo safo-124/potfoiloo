@@ -87,6 +87,21 @@ interface SiteSettings {
   linkedin?: string; scholar?: string; twitter?: string;
 }
 
+// ─── Simple Markdown Preview ──────────────────────────────────
+function simpleMarkdown(text: string): string {
+  return text
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/^### (.+)$/gm, "<h3 class='text-lg font-bold mt-4 mb-2'>$1</h3>")
+    .replace(/^## (.+)$/gm, "<h2 class='text-xl font-bold mt-4 mb-2'>$1</h2>")
+    .replace(/^# (.+)$/gm, "<h1 class='text-2xl font-bold mt-4 mb-2'>$1</h1>")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/`(.+?)`/g, "<code class='bg-muted px-1 py-0.5 rounded text-sm font-mono'>$1</code>")
+    .replace(/^- (.+)$/gm, "<li class='ml-4 list-disc'>$1</li>")
+    .replace(/\n\n/g, "<br/><br/>")
+    .replace(/\n/g, "<br/>");
+}
+
 // ─── Generic Form Modal ───────────────────────────────────────
 function FormModal({ title, open, onClose, onSubmit, children, loading }: {
   title: string; open: boolean; onClose: () => void;
@@ -987,7 +1002,19 @@ export default function AdminPage() {
         <Input placeholder="Title" value={(formData.title as string) || ""} onChange={e => setField("title", e.target.value)} required />
         <Input placeholder="Slug (url-friendly)" value={(formData.slug as string) || ""} onChange={e => setField("slug", e.target.value)} required />
         <Textarea placeholder="Excerpt (short summary)" value={(formData.excerpt as string) || ""} onChange={e => setField("excerpt", e.target.value)} required />
-        <Textarea placeholder="Content (markdown)" className="min-h-[200px] font-mono text-sm" value={(formData.content as string) || ""} onChange={e => setField("content", e.target.value)} required />
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium">Content (markdown)</label>
+            <Button type="button" variant="ghost" size="sm" onClick={() => setField("_preview", !(formData._preview as boolean))}>
+              {(formData._preview as boolean) ? <><PenTool className="h-3.5 w-3.5 mr-1" /> Write</> : <><Eye className="h-3.5 w-3.5 mr-1" /> Preview</>}
+            </Button>
+          </div>
+          {(formData._preview as boolean) ? (
+            <div className="min-h-[200px] rounded-md border border-input bg-background p-3 text-sm prose-custom overflow-auto max-h-[400px]" dangerouslySetInnerHTML={{ __html: simpleMarkdown((formData.content as string) || "") }} />
+          ) : (
+            <Textarea placeholder="Content (markdown)" className="min-h-[200px] font-mono text-sm" value={(formData.content as string) || ""} onChange={e => setField("content", e.target.value)} required />
+          )}
+        </div>
         <Input placeholder="Tags (comma separated)" value={Array.isArray(formData.tags) ? (formData.tags as string[]).join(", ") : ""} onChange={e => setField("tags", e.target.value.split(",").map(t => t.trim()).filter(Boolean))} />
         <Input placeholder="Cover image URL" value={(formData.coverImage as string) || ""} onChange={e => setField("coverImage", e.target.value)} />
         <label className="flex items-center gap-2 text-sm">

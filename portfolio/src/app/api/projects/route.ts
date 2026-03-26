@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -8,12 +10,15 @@ export async function GET() {
     });
     return NextResponse.json(projects);
   } catch (error) {
-    console.error("Failed to fetch projects:", error);
+    logger.error("projects", "Failed to fetch projects", error);
     return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { title, slug, description, longDescription, imageUrl, demoUrl, githubUrl, tags, category, featured, order } = body;
@@ -27,7 +32,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
-    console.error("Failed to create project:", error);
+    logger.error("projects", "Failed to create project", error);
     return NextResponse.json({ error: "Failed to create project" }, { status: 500 });
   }
 }

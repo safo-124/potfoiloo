@@ -9,6 +9,7 @@ import {
   Layers,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { BrowserFrame } from "@/components/ui/browser-frame";
 
 export const revalidate = 60;
 
@@ -27,6 +28,19 @@ export default async function ProjectDetailPage({
   }
 
   if (!project) return notFound();
+
+  // Fetch related projects (same category, excluding current)
+  let relatedProjects: { slug: string; title: string; description: string; tags: string[]; category: string }[] = [];
+  try {
+    relatedProjects = await prisma.project.findMany({
+      where: { category: project.category, slug: { not: project.slug } },
+      take: 3,
+      orderBy: { createdAt: "desc" },
+      select: { slug: true, title: true, description: true, tags: true, category: true },
+    });
+  } catch {
+    // Non-critical, just skip
+  }
 
   return (
     <div className="min-h-screen pt-24 pb-16">
@@ -104,46 +118,14 @@ export default async function ProjectDetailPage({
           </div>
         </header>
 
-        {/* Live preview iframe */}
+        {/* Live preview */}
         {project.demoUrl && (
           <section className="mb-10">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <span className="h-5 w-1 bg-primary rounded-full" />
               Live Preview
             </h2>
-            <div className="rounded-xl overflow-hidden border border-border bg-muted/30 shadow-sm">
-              {/* Browser toolbar */}
-              <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/60 border-b border-border">
-                <div className="flex gap-1.5">
-                  <div className="h-3 w-3 rounded-full bg-red-400/70" />
-                  <div className="h-3 w-3 rounded-full bg-yellow-400/70" />
-                  <div className="h-3 w-3 rounded-full bg-green-400/70" />
-                </div>
-                <div className="flex-1 mx-3">
-                  <div className="bg-background/60 rounded-md px-3 py-1 text-xs text-muted-foreground truncate font-mono">
-                    {project.demoUrl.replace(/^https?:\/\//, "")}
-                  </div>
-                </div>
-                <a
-                  href={project.demoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
-              </div>
-              {/* Iframe */}
-              <div className="relative w-full" style={{ height: "500px" }}>
-                <iframe
-                  src={project.demoUrl}
-                  title={`Preview of ${project.title}`}
-                  className="absolute inset-0 w-full h-full border-0"
-                  loading="lazy"
-                  sandbox="allow-scripts allow-same-origin"
-                />
-              </div>
-            </div>
+            <BrowserFrame url={project.demoUrl} title={project.title} showExternalLink />
           </section>
         )}
 
@@ -177,6 +159,32 @@ export default async function ProjectDetailPage({
             ))}
           </div>
         </section>
+
+        {/* Related projects */}
+        {relatedProjects.length > 0 && (
+          <section className="mb-10">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <span className="h-5 w-1 bg-primary rounded-full" />
+              Related Projects
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedProjects.map((rp) => (
+                <Link
+                  key={rp.slug}
+                  href={`/projects/${rp.slug}`}
+                  className="group rounded-xl border border-border bg-card p-5 hover:border-primary/40 transition-colors"
+                >
+                  <h3 className="font-semibold text-sm group-hover:text-primary transition-colors mb-1">
+                    {rp.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {rp.description}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Footer nav */}
         <footer className="pt-8 border-t border-border">

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -8,12 +10,15 @@ export async function GET() {
     });
     return NextResponse.json(experiences);
   } catch (error) {
-    console.error("Failed to fetch experiences:", error);
+    logger.error("experiences", "Failed to fetch experiences", error);
     return NextResponse.json({ error: "Failed to fetch experiences" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { title, company, location, description, startDate, endDate, current, type, order } = body;
@@ -27,7 +32,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(experience, { status: 201 });
   } catch (error) {
-    console.error("Failed to create experience:", error);
+    logger.error("experiences", "Failed to create experience", error);
     return NextResponse.json({ error: "Failed to create experience" }, { status: 500 });
   }
 }

@@ -3,6 +3,8 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { SkillRadar } from "@/components/skill-radar";
+import { BarChart3, Radar } from "lucide-react";
 
 function SkillBar({
   name,
@@ -64,6 +66,7 @@ function groupSkillsIntoCategories(skills: SkillData[]): SkillCategory[] {
 export function SkillsSection({ data }: { data?: SkillData[] }) {
   const categories = data ? groupSkillsIntoCategories(data) : [];
   const [activeId, setActiveId] = useState(categories[0]?.id ?? "");
+  const [viewMode, setViewMode] = useState<"bars" | "radar">("bars");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   if (categories.length === 0) {
@@ -101,6 +104,29 @@ export function SkillsSection({ data }: { data?: SkillData[] }) {
             A comprehensive overview of my technical capabilities across
             languages, frameworks, tools, and domain expertise
           </p>
+          {/* View mode toggle */}
+          <div className="flex justify-center gap-1 mt-4">
+            <button
+              onClick={() => setViewMode("bars")}
+              className={cn(
+                "p-2 rounded-lg transition-colors",
+                viewMode === "bars" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+              aria-label="Bar chart view"
+            >
+              <BarChart3 className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("radar")}
+              className={cn(
+                "p-2 rounded-lg transition-colors",
+                viewMode === "radar" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+              aria-label="Radar chart view"
+            >
+              <Radar className="h-4 w-4" />
+            </button>
+          </div>
         </motion.div>
 
         <motion.div
@@ -141,17 +167,26 @@ export function SkillsSection({ data }: { data?: SkillData[] }) {
             ))}
           </div>
 
-          {/* Skill grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-            {activeCategory.skills.map((skill, index) => (
-              <SkillBar
-                key={`${activeId}-${skill.name}`}
-                name={skill.name}
-                level={skill.level}
-                delay={index * 0.05}
+          {/* Skill view */}
+          {viewMode === "bars" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+              {activeCategory.skills.map((skill, index) => (
+                <SkillBar
+                  key={`${activeId}-${skill.name}`}
+                  name={skill.name}
+                  level={skill.level}
+                  delay={index * 0.05}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <SkillRadar
+                skills={activeCategory.skills}
+                size={Math.min(400, 320)}
               />
-            ))}
-          </div>
+            </div>
+          )}
 
           {/* Summary footer */}
           <div className="mt-6 text-center">

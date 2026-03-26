@@ -24,6 +24,7 @@ import {
   BookOpen,
   Mail,
 } from "lucide-react";
+import { BrowserFrame } from "@/components/ui/browser-frame";
 
 /* ─── Animated Counter ─── */
 function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: string }) {
@@ -61,61 +62,6 @@ const highlights = [
   { icon: Code2, title: "Software Engineering", color: "text-emerald-600" },
   { icon: Database, title: "Data Analysis", color: "text-emerald-500" },
 ];
-
-/* ─── Browser Frame Preview ─── */
-function BrowserFrame({ url, title }: { url: string; title: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.3);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const measure = () => setScale(el.offsetWidth / 1280);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  return (
-    <div className="relative w-full rounded-xl overflow-hidden border border-border bg-muted/30 shadow-sm">
-      {/* Browser toolbar */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-muted/60 border-b border-border">
-        <div className="flex gap-1.5">
-          <div className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
-          <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/70" />
-          <div className="h-2.5 w-2.5 rounded-full bg-green-400/70" />
-        </div>
-        <div className="flex-1 mx-2">
-          <div className="bg-background/60 rounded-md px-3 py-0.5 text-[10px] text-muted-foreground truncate font-mono">
-            {url.replace(/^https?:\/\//, "")}
-          </div>
-        </div>
-      </div>
-      {/* Iframe viewport — scales to fill container width */}
-      <div
-        ref={containerRef}
-        className="relative w-full overflow-hidden"
-        style={{ height: `${800 * scale}px` }}
-      >
-        <iframe
-          src={url}
-          title={`Preview of ${title}`}
-          className="absolute top-0 left-0 border-0 pointer-events-none"
-          style={{
-            width: "1280px",
-            height: "800px",
-            transform: `scale(${scale})`,
-            transformOrigin: "top left",
-          }}
-          loading="lazy"
-          sandbox="allow-scripts allow-same-origin"
-          tabIndex={-1}
-        />
-      </div>
-    </div>
-  );
-}
 
 interface HomePreviewProps {
   featuredProjectsData?: { title: string; description: string; tags: string[]; category: string; demoUrl?: string | null }[];

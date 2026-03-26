@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -9,18 +14,21 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const skill = await prisma.skill.update({ where: { id }, data: { name, category, level, icon, order } });
     return NextResponse.json(skill);
   } catch (error) {
-    console.error("Failed to update skill:", error);
+    logger.error("skills", "Failed to update skill", error);
     return NextResponse.json({ error: "Failed to update skill" }, { status: 500 });
   }
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     await prisma.skill.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete skill:", error);
+    logger.error("skills", "Failed to delete skill", error);
     return NextResponse.json({ error: "Failed to delete skill" }, { status: 500 });
   }
 }

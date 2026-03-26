@@ -18,6 +18,7 @@ export default function TestimonialsSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [current, setCurrent] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touchStartX = useRef(0);
 
   useEffect(() => {
     fetch("/api/testimonials")
@@ -73,7 +74,14 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Card */}
-        <div className="relative">
+        <div
+          className="relative"
+          onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            const diff = touchStartX.current - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) go(diff > 0 ? 1 : -1);
+          }}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={t.id}

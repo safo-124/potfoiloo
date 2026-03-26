@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -8,12 +10,15 @@ export async function GET() {
     });
     return NextResponse.json(skills);
   } catch (error) {
-    console.error("Failed to fetch skills:", error);
+    logger.error("skills", "Failed to fetch skills", error);
     return NextResponse.json({ error: "Failed to fetch skills" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { name, category, level, icon, order } = body;
@@ -27,7 +32,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(skill, { status: 201 });
   } catch (error) {
-    console.error("Failed to create skill:", error);
+    logger.error("skills", "Failed to create skill", error);
     return NextResponse.json({ error: "Failed to create skill" }, { status: 500 });
   }
 }

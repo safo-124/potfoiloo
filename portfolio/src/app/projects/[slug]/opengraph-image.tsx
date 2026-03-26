@@ -1,0 +1,135 @@
+import { ImageResponse } from "next/og";
+import { prisma } from "@/lib/prisma";
+
+export const runtime = "nodejs";
+export const alt = "Project";
+export const size = { width: 1200, height: 630 };
+export const contentType = "image/png";
+
+export default async function Image({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+
+  let project: { title: string; description: string; tags: string[]; category: string } | null = null;
+  try {
+    project = await prisma.project.findFirst({
+      where: { slug },
+      select: { title: true, description: true, tags: true, category: true },
+    });
+  } catch {
+    /* empty */
+  }
+
+  const title = project?.title || "Project";
+  const description = project?.description || "";
+  const tags = project?.tags || [];
+  const category = project?.category || "";
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          width: "100%",
+          height: "100%",
+          padding: "60px",
+          background: "linear-gradient(135deg, #0a1612 0%, #0f2318 50%, #0a1612 100%)",
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        {/* Top bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div
+            style={{
+              width: "8px",
+              height: "32px",
+              background: "#10b981",
+              borderRadius: "4px",
+            }}
+          />
+          <span style={{ color: "#10b981", fontSize: "18px", fontWeight: 600 }}>
+            ESA_ Projects
+          </span>
+          {category && (
+            <span
+              style={{
+                marginLeft: "16px",
+                padding: "4px 14px",
+                borderRadius: "20px",
+                background: "rgba(16, 185, 129, 0.15)",
+                color: "#10b981",
+                fontSize: "14px",
+                fontWeight: 500,
+              }}
+            >
+              {category}
+            </span>
+          )}
+        </div>
+
+        {/* Title + description */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <h1
+            style={{
+              color: "#f1f5f9",
+              fontSize: title.length > 50 ? "44px" : "56px",
+              fontWeight: 700,
+              lineHeight: 1.2,
+              maxWidth: "900px",
+            }}
+          >
+            {title}
+          </h1>
+          {description && (
+            <p
+              style={{
+                color: "#94a3b8",
+                fontSize: "22px",
+                lineHeight: 1.4,
+                maxWidth: "800px",
+              }}
+            >
+              {description.length > 140 ? description.slice(0, 140) + "…" : description}
+            </p>
+          )}
+        </div>
+
+        {/* Bottom: tags + author */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+          }}
+        >
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {tags.slice(0, 5).map((tag) => (
+              <span
+                key={tag}
+                style={{
+                  padding: "6px 16px",
+                  borderRadius: "20px",
+                  background: "rgba(16, 185, 129, 0.1)",
+                  border: "1px solid rgba(16, 185, 129, 0.2)",
+                  color: "#6ee7b7",
+                  fontSize: "14px",
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <span style={{ color: "#64748b", fontSize: "16px" }}>
+            Emmanuel Safo Acheampong
+          </span>
+        </div>
+      </div>
+    ),
+    { ...size }
+  );
+}

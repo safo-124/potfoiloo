@@ -8,6 +8,7 @@ import {
   ArrowUpRight,
   Heart,
 } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
 const quickLinks = [
   { label: "About", href: "/about" },
@@ -17,18 +18,21 @@ const quickLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
-const socials = [
-  { href: "https://github.com", icon: Github, label: "GitHub" },
-  { href: "https://linkedin.com", icon: Linkedin, label: "LinkedIn" },
-  {
-    href: "https://scholar.google.com",
-    icon: BookOpen,
-    label: "Google Scholar",
-  },
-  { href: "mailto:hello@example.com", icon: Mail, label: "Email" },
-];
+export async function Footer() {
+  let settings: { github?: string | null; linkedin?: string | null; scholar?: string | null; email?: string | null } | null = null;
+  try {
+    settings = await prisma.siteSettings.findUnique({ where: { id: "main" } });
+  } catch {
+    // Fallback to defaults if DB is unavailable
+  }
 
-export function Footer() {
+  const socials = [
+    { href: settings?.github || "https://github.com", icon: Github, label: "GitHub" },
+    { href: settings?.linkedin || "https://linkedin.com", icon: Linkedin, label: "LinkedIn" },
+    { href: settings?.scholar || "https://scholar.google.com", icon: BookOpen, label: "Google Scholar" },
+    { href: settings?.email ? `mailto:${settings.email}` : "mailto:hello@example.com", icon: Mail, label: "Email" },
+  ];
+
   const currentYear = new Date().getFullYear();
 
   return (

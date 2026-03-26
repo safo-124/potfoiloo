@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 function parseDevice(ua: string): string {
   if (/mobile|android|iphone|ipod/i.test(ua)) return "mobile";
@@ -48,13 +50,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {
-    console.error("Failed to record page view:", error);
+    logger.error("analytics", "Failed to record page view", error);
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }
 
 // GET — retrieve analytics data (for admin)
 export async function GET(request: NextRequest) {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const days = parseInt(searchParams.get("days") || "30", 10);
@@ -117,7 +122,7 @@ export async function GET(request: NextRequest) {
       recentViews,
     });
   } catch (error) {
-    console.error("Failed to fetch analytics:", error);
+    logger.error("analytics", "Failed to fetch analytics", error);
     return NextResponse.json({ error: "Failed to fetch analytics" }, { status: 500 });
   }
 }

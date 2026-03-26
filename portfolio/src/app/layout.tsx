@@ -60,9 +60,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="alternate" type="application/rss+xml" title="ESA Blog RSS" href="/api/rss" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <a href="#main-content" className="skip-to-content">Skip to content</a>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -71,7 +75,7 @@ export default function RootLayout({
         >
           <RouteProgress />
           <Navbar />
-          <main>
+          <main id="main-content">
             <PageTransition>{children}</PageTransition>
           </main>
           <Footer />
