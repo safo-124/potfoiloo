@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
 function parseDevice(ua: string): string {
@@ -57,9 +56,6 @@ export async function POST(request: NextRequest) {
 
 // GET — retrieve analytics data (for admin)
 export async function GET(request: NextRequest) {
-  const authError = await requireAuth();
-  if (authError) return authError;
-
   try {
     const { searchParams } = new URL(request.url);
     const days = parseInt(searchParams.get("days") || "30", 10);

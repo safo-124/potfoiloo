@@ -311,10 +311,10 @@ export default function AdminPage() {
 
   // ─── Dashboard ─────────────────────────────────────────────
   const statCards = [
-    { label: "Projects", value: stats.projects, icon: FolderOpen },
-    { label: "Blog Posts", value: stats.blogPosts, icon: PenTool },
-    { label: "Publications", value: stats.publications, icon: BookOpen },
-    { label: "Messages", value: stats.messages, icon: MessageSquare },
+    { label: "Projects", value: stats.projects || projects.length, icon: FolderOpen },
+    { label: "Blog Posts", value: stats.blogPosts || blogPosts.length, icon: PenTool },
+    { label: "Publications", value: stats.publications || publications.length, icon: BookOpen },
+    { label: "Messages", value: stats.messages || messages.length, icon: MessageSquare },
     { label: "Page Views", value: analytics?.totalViews ?? 0, icon: Activity },
   ];
 

@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
 export async function GET() {
-  const authError = await requireAuth();
-  if (authError) return authError;
-
   try {
     const [projects, blogPosts, publications, messages] = await Promise.all([
       prisma.project.count(),
